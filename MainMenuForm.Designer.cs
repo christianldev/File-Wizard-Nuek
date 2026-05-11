@@ -1,6 +1,6 @@
 ﻿namespace File_Wizard
 {
-    partial class Form1
+    partial class MainMenuForm
     {
         /// <summary>
         /// Variable del diseñador necesaria.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainMenuForm));
             this.DTdownbutton = new System.Windows.Forms.Button();
             this.DTuploadbutton = new System.Windows.Forms.Button();
             this.QAdownbutton = new System.Windows.Forms.Button();
@@ -79,7 +79,7 @@
             this.QAuploadbutton.UseVisualStyleBackColor = true;
             this.QAuploadbutton.Click += new System.EventHandler(this.QAuploadbutton_Click);
             // 
-            // Form1
+            // MainMenuForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -92,7 +92,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.Name = "Form1";
+            this.Name = "MainMenuForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "File Wizard v1.0";
             this.ResumeLayout(false);

@@ -12,13 +12,13 @@ using System.Windows.Forms;
 
 namespace File_Wizard
 {
-    public partial class Form4 : Form
+    public partial class DesaTestUploadForm : Form
     {
         private bool subidaCorrecta = false;
         private string rutaLocal = @"C:";
         private List<string> commandHistory = new List<string>();
         private int historyIndex = -1;
-        public Form4()
+        public DesaTestUploadForm()
         {
             InitializeComponent();
         }

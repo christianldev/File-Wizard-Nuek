@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace File_Wizard
 {
-    partial class Form2
+    partial class DesaTestDownloadForm
     {
         /// <summary>
         /// Required designer variable.
@@ -33,7 +33,7 @@ namespace File_Wizard
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DesaTestDownloadForm));
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.button6 = new System.Windows.Forms.Button();
             this.label7 = new System.Windows.Forms.Label();
@@ -318,7 +318,7 @@ namespace File_Wizard
             this.checkBox1.Text = "PREFIJO?";
             this.checkBox1.UseVisualStyleBackColor = true;
             // 
-            // Form2
+            // DesaTestDownloadForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -348,7 +348,7 @@ namespace File_Wizard
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.Name = "Form2";
+            this.Name = "DesaTestDownloadForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DESA-TEST DOWNLOADER";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form2_FormClosing);

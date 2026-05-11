@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace File_Wizard
 {
-    partial class Form3
+    partial class QaDownloadForm
     {
         /// <summary>
         /// Required designer variable.
@@ -33,7 +33,7 @@ namespace File_Wizard
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form3));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(QaDownloadForm));
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
@@ -354,7 +354,7 @@ namespace File_Wizard
             this.checkBox1.Text = "PREFIJO?";
             this.checkBox1.UseVisualStyleBackColor = true;
             // 
-            // Form3
+            // QaDownloadForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -385,7 +385,7 @@ namespace File_Wizard
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.Name = "Form3";
+            this.Name = "QaDownloadForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "QASSUR DOWNLOADER";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form3_FormClosing);

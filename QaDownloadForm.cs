@@ -16,14 +16,14 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 
 namespace File_Wizard
 {
-    public partial class Form3 : Form
+    public partial class QaDownloadForm : Form
     {
         private bool cancelarDescarga = false;
         private bool descargaCorrecta = false;
         private string rutaLocal = @"C:";
         private List<string> commandHistory = new List<string>();
         private int historyIndex = -1;
-        public Form3()
+        public QaDownloadForm()
         {
             InitializeComponent();
         }

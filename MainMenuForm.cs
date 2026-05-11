@@ -10,16 +10,16 @@ using System.Windows.Forms;
 
 namespace File_Wizard
 {
-    public partial class Form1 : Form
+    public partial class MainMenuForm : Form
     {
-        public Form1()
+        public MainMenuForm()
         {
             InitializeComponent();
         }
 
         private void DTuploadbutton_Click(object sender, EventArgs e)
         {
-            Form4 form4 = new Form4();
+            DesaTestUploadForm form4 = new DesaTestUploadForm();
             form4.Show();
         }
 
@@ -30,13 +30,13 @@ namespace File_Wizard
 
         private void DTdownbutton_Click(object sender, EventArgs e)
         {
-            Form2 form2 = new Form2();
+            DesaTestDownloadForm form2 = new DesaTestDownloadForm();
             form2.Show();
         }
 
         private void QAdownbutton_Click(object sender, EventArgs e)
         {
-            Form3 form3 = new Form3();
+            QaDownloadForm form3 = new QaDownloadForm();
             form3.Show();
         }
     }
