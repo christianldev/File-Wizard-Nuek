@@ -1,0 +1,43 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio cache/config
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.VC.opendb
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+
+# Publish / deployment
+publish/
+*.publishsettings
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+
+# Windows thumbnail cache
+Thumbs.db
+Desktop.ini
+
+# Rider / ReSharper
+.idea/
+*_i.c
+*_p.c
+*_h.h
+*.resharper
+*.DotSettings.user
+
+# Generated files
+*.cache
+*.lastcodeanalysissucceeded
