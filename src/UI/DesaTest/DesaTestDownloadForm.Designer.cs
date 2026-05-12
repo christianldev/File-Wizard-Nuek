@@ -137,8 +137,8 @@ namespace File_Wizard.UI.DesaTest
             this.mainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainPanel.Location = new System.Drawing.Point(0, 98);
             this.mainPanel.Name = "mainPanel";
-            this.mainPanel.Padding = new System.Windows.Forms.Padding(18, 18, 18, 18);
-            this.mainPanel.Size = new System.Drawing.Size(860, 522);
+            this.mainPanel.Padding = new System.Windows.Forms.Padding(16, 16, 16, 16);
+            this.mainPanel.Size = new System.Drawing.Size(860, 545);
             this.mainPanel.TabIndex = 1;
             // 
             // leftCard
@@ -152,7 +152,7 @@ namespace File_Wizard.UI.DesaTest
             this.leftCard.Controls.Add(this.label3);
             this.leftCard.Controls.Add(this.button2);
             this.leftCard.Controls.Add(this.groupBox1);
-            this.leftCard.Location = new System.Drawing.Point(18, 18);
+            this.leftCard.Location = new System.Drawing.Point(16, 16);
             this.leftCard.Name = "leftCard";
             this.leftCard.Padding = new System.Windows.Forms.Padding(16);
             this.leftCard.Size = new System.Drawing.Size(400, 230);
@@ -168,10 +168,10 @@ namespace File_Wizard.UI.DesaTest
             this.rightCard.Controls.Add(this.button5);
             this.rightCard.Controls.Add(this.button3);
             this.rightCard.Controls.Add(this.button4);
-            this.rightCard.Location = new System.Drawing.Point(432, 18);
+            this.rightCard.Location = new System.Drawing.Point(428, 16);
             this.rightCard.Name = "rightCard";
             this.rightCard.Padding = new System.Windows.Forms.Padding(16);
-            this.rightCard.Size = new System.Drawing.Size(410, 230);
+            this.rightCard.Size = new System.Drawing.Size(412, 230);
             this.rightCard.TabIndex = 1;
             // 
             // bottomCard
@@ -188,10 +188,10 @@ namespace File_Wizard.UI.DesaTest
             this.bottomCard.Controls.Add(this.button6);
             this.bottomCard.Controls.Add(this.leftCardHeader);
             this.bottomCard.Controls.Add(this.remoteHintLabel);
-            this.bottomCard.Location = new System.Drawing.Point(18, 260);
+            this.bottomCard.Location = new System.Drawing.Point(16, 260);
             this.bottomCard.Name = "bottomCard";
             this.bottomCard.Padding = new System.Windows.Forms.Padding(16);
-            this.bottomCard.Size = new System.Drawing.Size(824, 240);
+            this.bottomCard.Size = new System.Drawing.Size(828, 260);
             this.bottomCard.TabIndex = 2;
             this.bottomCard.Visible = true;
             // 
@@ -305,21 +305,24 @@ namespace File_Wizard.UI.DesaTest
             // 
             // pictureBox1
             // 
-            this.pictureBox1.BackColor = System.Drawing.Color.White;
-            this.pictureBox1.Image = global::File_Wizard.Properties.Resources.pug_sad_ezgif_com_effects;
-            this.pictureBox1.Location = new System.Drawing.Point(256, 16);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(138, 110);            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 44;
-            this.pictureBox1.TabStop = false;
+            //this.pictureBox1.BackColor = System.Drawing.Color.White;
+            //this.pictureBox1.Image = global::File_Wizard.Properties.Resources.pug_sad_ezgif_com_effects;
+            //this.pictureBox1.Location = new System.Drawing.Point(256, 16);
+            //this.pictureBox1.Name = "pictureBox1";
+            //this.pictureBox1.Size = new System.Drawing.Size(138, 110);            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            //this.pictureBox1.TabIndex = 44;
+            //this.pictureBox1.TabStop = false;
             // 
             // progressBar1
             // 
             this.progressBar1.Location = new System.Drawing.Point(16, 188);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(378, 23);            this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.progressBar1.Size = new System.Drawing.Size(378, 26);
+            this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(111)))), ((int)(((byte)(235)))));
             this.progressBar1.TabIndex = 43;
             this.progressBar1.Visible = false;
+            this.progressBar1.Margin = new System.Windows.Forms.Padding(0);
             // 
             // label3
             // 
@@ -412,7 +415,7 @@ namespace File_Wizard.UI.DesaTest
             this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button3.Font = new System.Drawing.Font("Segoe UI Semibold", 7.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button3.ForeColor = System.Drawing.Color.White;
-            this.button3.Location = new System.Drawing.Point(142, 147);
+            this.button3.Location = new System.Drawing.Point(17, 187);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(140, 34);            this.button3.TabIndex = 34;
             this.button3.Text = "DESCARGAR ARCHIVOS";
@@ -475,12 +478,13 @@ namespace File_Wizard.UI.DesaTest
             // 
             this.label4.AutoSize = true;
             this.label4.BackColor = System.Drawing.Color.Transparent;
-            this.label4.Font = new System.Drawing.Font("Segoe UI Semibold", 9.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
-            this.label4.Location = new System.Drawing.Point(16, 110);            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(98, 18);
+            this.label4.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(23)))), ((int)(((byte)(42)))));
+            this.label4.Location = new System.Drawing.Point(16, 12);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(119, 19);
             this.label4.TabIndex = 30;
-            this.label4.Text = "Progreso>>";
+            this.label4.Text = "Progreso de descarga";
             // 
             // label2
             // 
@@ -525,9 +529,8 @@ namespace File_Wizard.UI.DesaTest
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(247)))), ((int)(((byte)(252)))));
-            this.ClientSize = new System.Drawing.Size(676, 459);
+            this.ClientSize = new System.Drawing.Size(876, 665);
             this.Controls.Add(this.mainPanel);
             this.Controls.Add(this.headerPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
