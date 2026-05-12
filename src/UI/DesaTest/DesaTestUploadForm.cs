@@ -1,16 +1,11 @@
-﻿using Renci.SshNet;
+using Renci.SshNet;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace File_Wizard
+namespace File_Wizard.UI.DesaTest
 {
     public partial class DesaTestUploadForm : Form
     {
@@ -18,6 +13,7 @@ namespace File_Wizard
         private string rutaLocal = @"C:";
         private List<string> commandHistory = new List<string>();
         private int historyIndex = -1;
+
         public DesaTestUploadForm()
         {
             InitializeComponent();
@@ -116,12 +112,14 @@ namespace File_Wizard
                 MessageBox.Show("Selecciona un directorio :)");
                 return;
             }
+
             string archivo = textBox1.Text.Trim();
             if (archivo.Contains("/") || archivo.Contains("?"))
             {
                 MessageBox.Show("El nombre del archivo a subir tiene caracteres no permitidos: * ?");
                 return;
             }
+
             string rutaCompleta = Path.Combine(txtDir.Text.Trim(), archivo);
             if (File.Exists(rutaCompleta))
             {
@@ -194,6 +192,7 @@ namespace File_Wizard
                         break;
                 }
             }
+
             if (hubodirectorio)
             {
                 try
@@ -201,17 +200,19 @@ namespace File_Wizard
                     string rutaCompletaRemota = directorio + "/" + archivo;
                     if (client.Exists(rutaCompletaRemota))
                     {
-                        if (MessageBox.Show("¿Estás seguro de sobreescribir este archivo?", "CONFIRMACION", MessageBoxButtons.YesNo) == DialogResult.No)
+                        if (MessageBox.Show("\u00bfEst\u00e1s seguro de sobreescribir este archivo?", "CONFIRMACION", MessageBoxButtons.YesNo) == DialogResult.No)
                         {
                             MessageBox.Show("SUBIDA CANCELADA POR EL USUARIO");
                             return;
                         }
                     }
+
                     using (FileStream fs = new FileStream(rutaLocalCompleta, FileMode.Open))
                     {
                         client.UploadFile(fs, rutaCompletaRemota);
                     }
-                    MessageBox.Show("El archivo se subió correctamente :)");
+
+                    MessageBox.Show("El archivo se subi\u00f3 correctamente :)");
                 }
                 catch
                 {
@@ -220,7 +221,7 @@ namespace File_Wizard
             }
             else
             {
-                MessageBox.Show("Error - No se encontró directorio válido para el archivo: " + archivo);
+                MessageBox.Show("Error - No se encontr\u00f3 directorio v\u00e1lido para el archivo: " + archivo);
             }
         }
 
@@ -243,6 +244,7 @@ namespace File_Wizard
                     MessageBox.Show("Selecciona un directorio :)");
                     return;
                 }
+
                 string rutaCompletaRemota = textBox3.Text.Trim();
                 if (rutaCompletaRemota.Contains("/") && rutaCompletaRemota.StartsWith("/") && !rutaCompletaRemota.EndsWith("/")
                     && !rutaCompletaRemota.Contains("*") && !rutaCompletaRemota.Contains("?"))
@@ -254,6 +256,7 @@ namespace File_Wizard
                         MessageBox.Show("El archivo que se desea subir no existe en el directorio local :(");
                         return;
                     }
+
                     SubidaManual(rutaCompletaLocal, rutaCompletaRemota, archivo);
                     if (subidaCorrecta)
                     {
@@ -306,7 +309,7 @@ namespace File_Wizard
             {
                 if (client.Exists(rutaSalidaRemotaCompleta))
                 {
-                    if (MessageBox.Show("¿Estás seguro de sobreescribir este archivo?", "CONFIRMACION", MessageBoxButtons.YesNo) == DialogResult.No)
+                    if (MessageBox.Show("\u00bfEst\u00e1s seguro de sobreescribir este archivo?", "CONFIRMACION", MessageBoxButtons.YesNo) == DialogResult.No)
                     {
                         subidaCorrecta = false;
                         MessageBox.Show("SUBIDA CANCELADA POR EL USUARIO");
@@ -318,7 +321,7 @@ namespace File_Wizard
                     client.UploadFile(fs, rutaSalidaRemotaCompleta);
                 }
                 subidaCorrecta = true;
-                MessageBox.Show("El archivo se subió correctamente :)");
+                MessageBox.Show("El archivo se subi\u00f3 correctamente :)");
             }
             catch
             {
@@ -344,6 +347,7 @@ namespace File_Wizard
                 MessageBox.Show("Selecciona un directorio :)");
                 return;
             }
+
             string rutaCompletaRemota = textBox3.Text.Trim();
             if (rutaCompletaRemota.Contains("/") && rutaCompletaRemota.StartsWith("/") && !rutaCompletaRemota.EndsWith("/")
                 && !rutaCompletaRemota.Contains("*") && !rutaCompletaRemota.Contains("?"))
@@ -371,3 +375,4 @@ namespace File_Wizard
         }
     }
 }
+

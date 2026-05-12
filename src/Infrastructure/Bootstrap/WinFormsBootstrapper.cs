@@ -1,14 +1,14 @@
 using System.Windows.Forms;
 
-namespace File_Wizard
+namespace File_Wizard.Infrastructure.Bootstrap
 {
-    internal static class WinFormsBootstrapper
+    public static class WinFormsBootstrapper
     {
         public static void Initialize()
         {
-            Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
         }
     }
 }
+

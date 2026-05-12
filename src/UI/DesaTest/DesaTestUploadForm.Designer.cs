@@ -1,6 +1,6 @@
-﻿using Renci.SshNet;
+using Renci.SshNet;
 
-namespace File_Wizard
+namespace File_Wizard.UI.DesaTest
 {
     partial class DesaTestUploadForm
     {

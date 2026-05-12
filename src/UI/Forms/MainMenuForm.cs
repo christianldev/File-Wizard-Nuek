@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 using System.Windows.Forms;
 
-namespace File_Wizard
+namespace File_Wizard.UI.Forms
 {
     public partial class MainMenuForm : Form
     {
@@ -19,8 +12,7 @@ namespace File_Wizard
 
         private void DTuploadbutton_Click(object sender, EventArgs e)
         {
-            DesaTestUploadForm form4 = new DesaTestUploadForm();
-            form4.Show();
+            new File_Wizard.UI.DesaTest.DesaTestUploadForm().Show();
         }
 
         private void QAuploadbutton_Click(object sender, EventArgs e)
@@ -30,14 +22,13 @@ namespace File_Wizard
 
         private void DTdownbutton_Click(object sender, EventArgs e)
         {
-            DesaTestDownloadForm form2 = new DesaTestDownloadForm();
-            form2.Show();
+            new File_Wizard.UI.DesaTest.DesaTestDownloadForm().Show();
         }
 
         private void QAdownbutton_Click(object sender, EventArgs e)
         {
-            QaDownloadForm form3 = new QaDownloadForm();
-            form3.Show();
+            new File_Wizard.UI.Qa.QaDownloadForm().Show();
         }
     }
 }
+

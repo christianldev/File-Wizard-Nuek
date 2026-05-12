@@ -1,30 +1,25 @@
-﻿using Renci.SshNet;
+using Renci.SshNet;
 using Renci.SshNet.Sftp;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 
-namespace File_Wizard
+namespace File_Wizard.UI.Qa
 {
-    public partial class DesaTestDownloadForm : Form
+    public partial class QaDownloadForm : Form
     {
         private bool cancelarDescarga = false;
         private bool descargaCorrecta = false;
         private string rutaLocal = @"C:";
         private List<string> commandHistory = new List<string>();
         private int historyIndex = -1;
-        public DesaTestDownloadForm()
+
+        public QaDownloadForm()
         {
             InitializeComponent();
         }
@@ -50,7 +45,7 @@ namespace File_Wizard
         {
             try
             {
-                client = new SftpClient("10.22.98.131", "i584039", "I584039");
+                client = new SftpClient("172.21.200.16", "0satnexc", "0satnexc");
                 client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(8);
                 client.Connect();
                 if (client.IsConnected)
@@ -98,7 +93,7 @@ namespace File_Wizard
             }
         }
 
-        private void Form2_FormClosing(object sender, FormClosingEventArgs e)
+        private void Form3_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (client != null && client.IsConnected)
             {
@@ -123,6 +118,11 @@ namespace File_Wizard
                 MessageBox.Show("Selecciona un directorio :)");
                 return;
             }
+            if (radioButton4.Checked && string.IsNullOrWhiteSpace(textBox2.Text))
+            {
+                MessageBox.Show("Escribir por favor la ruta remota :)");
+                return;
+            }
             cancelarDescarga = false;
             DesactivarBotones();
             Thread descargaThread = new Thread(() =>
@@ -136,25 +136,19 @@ namespace File_Wizard
             descargaThread.Start();
         }
 
-        private List<ISftpFile> ObtenerArchivosDelDirectorio(
-                SftpClient client,
-                string remoteDirectory)
+        private List<ISftpFile> ObtenerArchivosDelDirectorio(SftpClient sftpClient, string remoteDirectory)
         {
-            // 🔹 ¿Ya está en cache?
             if (cacheDirectorios.ContainsKey(remoteDirectory))
             {
                 return cacheDirectorios[remoteDirectory];
             }
 
-            // 🔹 No está → listar una sola vez
-            var archivos = client
+            var archivos = sftpClient
                 .ListDirectory(remoteDirectory)
                 .Where(f => f.IsRegularFile)
                 .ToList();
 
-            // 🔹 Guardar en cache
             cacheDirectorios.Add(remoteDirectory, archivos);
-
             return archivos;
         }
 
@@ -174,57 +168,117 @@ namespace File_Wizard
                     bool hubodirectorio = true;
                     if (radioButton1.Checked)
                     {
-                        prefijoPredict = "DESA-";
+                        prefijoPredict = "QA-";
 
                         switch (extension)
                         {
                             case ".sh":
-                                directorio = "/sat/cdp/desa/cad";
+                                directorio = "/satqanexc/cad";
                                 break;
                             case ".cbl":
                             case ".pco":
-                                directorio = "/sat/cdp/desa/src";
+                                directorio = "/satqanexc/src";
                                 break;
                             case ".scl":
-                                directorio = "/sat/cdp/desa/cad/scl";
+                                directorio = "/satqanexc/cad/scl";
                                 break;
                             case ".fact":
-                                directorio = "/sat/cdp/desa/adm/fact";
+                                directorio = "/satqanexc/adm/fact";
                                 break;
                             case ".sql":
-                                directorio = "/sat/cdp/desa/adm/sql";
+                                directorio = "/satqanexc/adm/sql";
                                 break;
                             case "":
-                                directorio = "/sat/cdp/desa/cpy";
+                                directorio = "/satqanexc/cpy";
                                 break;
                             default:
-                                hubodirectorio=false;
+                                hubodirectorio = false;
                                 break;
                         }
                     }
-                    else
+                    if (radioButton2.Checked)
                     {
-                        prefijoPredict = "TEST-";
+                        prefijoPredict = "QA-COMUNIT-";
+
                         switch (extension)
                         {
                             case ".sh":
-                                directorio = "/sat/cdp/test/cad";
+                                directorio = "/satqanexus/cad";
                                 break;
                             case ".cbl":
                             case ".pco":
-                                directorio = "/sat/cdp/test/src";
+                                directorio = "/satqanexus/src";
                                 break;
                             case ".scl":
-                                directorio = "/sat/cdp/test/cad/scl";
+                                directorio = "/satqanexus/cad/scl";
                                 break;
                             case ".fact":
-                                directorio = "/sat/cdp/test/adm/fact";
+                                directorio = "/satqanexus/adm/fact";
                                 break;
                             case ".sql":
-                                directorio = "/sat/cdp/test/adm/sql";
+                                directorio = "/satqanexus/adm/sql";
                                 break;
                             case "":
-                                directorio = "/sat/cdp/test/cpy";
+                                directorio = "/satqanexus/cpy";
+                                break;
+                            default:
+                                hubodirectorio = false;
+                                break;
+                        }
+                    }
+                    if (radioButton3.Checked)
+                    {
+                        prefijoPredict = "QA-BCHILE-";
+
+                        switch (extension)
+                        {
+                            case ".sh":
+                                directorio = "/satbcnxqa/cad";
+                                break;
+                            case ".cbl":
+                            case ".pco":
+                                directorio = "/satbcnxqa/src";
+                                break;
+                            case ".scl":
+                                directorio = "/satbcnxqa/cad/scl";
+                                break;
+                            case ".fact":
+                                directorio = "/satbcnxqa/adm/fact";
+                                break;
+                            case ".sql":
+                                directorio = "/satbcnxqa/adm/sql";
+                                break;
+                            case "":
+                                directorio = "/satbcnxqa/cpy";
+                                break;
+                            default:
+                                hubodirectorio = false;
+                                break;
+                        }
+                    }
+                    if (radioButton4.Checked)
+                    {
+                        prefijoPredict = "QAX-";
+                        switch (extension)
+                        {
+                            case ".sh":
+                                directorio = "/" + textBox2.Text.Trim() + "/cad";
+                                break;
+                            case ".cbl":
+                            case ".pco":
+                                directorio = "/" + textBox2.Text.Trim() + "/src";
+                                break;
+                            case ".scl":
+                                directorio = "/" + textBox2.Text.Trim() + "/cad/scl";
+                                break;
+                            case ".fact":
+                                directorio = "/" + textBox2.Text.Trim() + "/adm/fact";
+                                break;
+                            case ".sql":
+                                directorio = "/" + textBox2.Text.Trim() + "/adm/sql";
+                                break;
+                            case "":
+                                directorio = "/" + textBox2.Text.Trim() + "/cpy";
                                 break;
                             default:
                                 hubodirectorio = false;
@@ -311,8 +365,6 @@ namespace File_Wizard
                                         }
 
                                         totalBytesDownloaded += bytesRead;
-
-                                        // Actualizar la barra de progreso en la UI
                                         Invoke((Action)(() =>
                                         {
                                             if (totalBytesDownloaded > (ulong)progressBar1.Maximum)
@@ -369,7 +421,7 @@ namespace File_Wizard
                                 List<ISftpFile> archivos = ObtenerArchivosDelDirectorio(client, directorio);
                                 foreach (var archivo in archivos)
                                 {
-                                    if (System.Text.RegularExpressions.Regex.IsMatch(archivo.Name, regexPattern))
+                                    if (Regex.IsMatch(archivo.Name, regexPattern))
                                     {
                                         numarchivosmatch++;
                                         if (cancelarDescarga)
@@ -414,8 +466,6 @@ namespace File_Wizard
                                                 }
 
                                                 totalBytesDownloaded += bytesRead;
-
-                                                // Actualizar la barra de progreso en la UI
                                                 Invoke((Action)(() =>
                                                 {
                                                     if (totalBytesDownloaded > (ulong)progressBar1.Maximum)
@@ -490,7 +540,6 @@ namespace File_Wizard
                     {
                         MessageBox.Show(this, "Archivo descargado correctmente");
                     });
-                    
                 }
                 else
                 {
@@ -547,6 +596,19 @@ namespace File_Wizard
         {
             cacheDirectorios.Clear();
             MessageBox.Show("Cache de directorios limpiado");
+        }
+
+        private void radioButton4_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton4.Checked)
+            {
+                textBox2.Text = "Ejem: satitanxqa (sin barras)";
+                textBox2.Visible = true;
+            }
+            else
+            {
+                textBox2.Visible = false;
+            }
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -714,9 +776,11 @@ namespace File_Wizard
             button6.BackColor = SystemColors.ActiveBorder;
             radioButton1.Enabled = false;
             radioButton2.Enabled = false;
-            checkBox1.Enabled = false;
+            radioButton3.Enabled = false;
+            radioButton4.Enabled = false;
             textBox3.Enabled = false;
         }
+
         public void ActivarBotones()
         {
             if (client == null || !client.IsConnected)
@@ -747,8 +811,10 @@ namespace File_Wizard
             button1.BackColor = SystemColors.ControlLight;
             radioButton1.Enabled = true;
             radioButton2.Enabled = true;
-            checkBox1.Enabled=true;
-            textBox3.Enabled= true;
+            radioButton3.Enabled = true;
+            radioButton4.Enabled = true;
+            textBox3.Enabled = true;
         }
     }
 }
+

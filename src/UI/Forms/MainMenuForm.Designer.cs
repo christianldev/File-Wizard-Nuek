@@ -1,4 +1,4 @@
-﻿namespace File_Wizard
+namespace File_Wizard.UI.Forms
 {
     partial class MainMenuForm
     {
@@ -107,4 +107,5 @@
         private System.Windows.Forms.Button QAuploadbutton;
     }
 }
+
 
