@@ -8,19 +8,22 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using File_Wizard.Infrastructure;
 
 namespace File_Wizard.UI.DesaTest
 {
     public partial class DesaTestDownloadForm : Form
     {
+        private readonly SftpConnectionSettings connectionSettings;
         private bool cancelarDescarga = false;
         private bool descargaCorrecta = false;
         private string rutaLocal = @"C:";
         private readonly List<string> commandHistory = new List<string>();
         private int historyIndex = -1;
 
-        public DesaTestDownloadForm()
+        public DesaTestDownloadForm(SftpConnectionSettings connectionSettings)
         {
+            this.connectionSettings = connectionSettings ?? throw new ArgumentNullException(nameof(connectionSettings));
             InitializeComponent();
         }
 
@@ -45,7 +48,7 @@ namespace File_Wizard.UI.DesaTest
         {
             try
             {
-                client = new SftpClient("10.22.98.131", "i584039", "I584039");
+                client = new SftpClient(connectionSettings.Host, connectionSettings.Port, connectionSettings.Username, connectionSettings.Password);
                 client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(8);
                 client.Connect();
                 if (client.IsConnected)

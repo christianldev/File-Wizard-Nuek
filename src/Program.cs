@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using File_Wizard.Infrastructure.Bootstrap;
+using File_Wizard.UI.Auth;
 using File_Wizard.UI.Forms;
 
 namespace File_Wizard
@@ -17,7 +18,16 @@ namespace File_Wizard
         static void Main()
         {
             WinFormsBootstrapper.Initialize();
-            Application.Run(new MainMenuForm());
+
+            using (var loginForm = new SftpLoginForm())
+            {
+                if (loginForm.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                Application.Run(new MainMenuForm(loginForm.ConnectionSettings));
+            }
         }
     }
 }
