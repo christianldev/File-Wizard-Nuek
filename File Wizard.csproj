@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+	<TargetFramework>net10.0-windows</TargetFramework>
     <RootNamespace>File_Wizard</RootNamespace>
     <AssemblyName>File Wizard</AssemblyName>
     <UseWindowsForms>true</UseWindowsForms>

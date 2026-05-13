@@ -565,6 +565,11 @@ namespace File_Wizard.UI.DesaTest
                 MessageBox.Show("SE PERDIO LA CONEXION CON EL SERVIDOR");
             }
         }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
 
