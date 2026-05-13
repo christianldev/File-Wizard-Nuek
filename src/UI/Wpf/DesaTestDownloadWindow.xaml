@@ -64,22 +64,23 @@
                                     Margin="0,0,12,0"
                                     Content="Conectar"
                                     Click="ConnectButton_Click" />
-                            <TextBlock x:Name="ConnectionStatusText"
-                                       Width="120"
-                                       Height="34"
-                                       Background="Tomato"
-                                       Foreground="White"
-                                       FontWeight="Bold"
-                                       TextAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       Padding="0,7,0,0"
-                                       Text="DESCONECTADO" />
+                            
                             <Button x:Name="ClearCacheButton"
                                     Width="160"
                                     Height="34"
-                                    Margin="12,0,0,0"
+                                    Margin="0,0,12,0"
                                     Content="Limpiar caché"
                                     Click="ClearCacheButton_Click" />
+                            <TextBlock x:Name="ConnectionStatusText"
+           Width="120"
+           Height="34"
+           Background="Tomato"
+           Foreground="White"
+           FontWeight="Bold"
+           TextAlignment="Center"
+           VerticalAlignment="Center"
+           Padding="0,7,0,0"
+           Text="DESCONECTADO" />
                         </StackPanel>
                     </StackPanel>
                 </Border>

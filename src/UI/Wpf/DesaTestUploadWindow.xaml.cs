@@ -44,24 +44,38 @@ namespace File_Wizard.UI.Wpf
             }
         }
 
+        private string[]? archivosSeleccionadosParaSubir;
+
         private void BrowseButton_Click(object sender, RoutedEventArgs e)
         {
-            var openDialog = new VistaFolderBrowserDialog
+            var openDialog = new VistaOpenFileDialog
             {
-                SelectedPath = rutaLocal,
-                Description = "Selecciona el directorio donde se encuentran los componentes...",
-                UseDescriptionForTitle = true,
-                ShowNewFolderButton = true
+                Title = "Selecciona el/los archivo(s) que deseas subir...",
+                Filter = "Todos los archivos (*.*)|*.*",
+                Multiselect = true // Permitir multiselect
             };
+
+            if (Directory.Exists(rutaLocal))
+            {
+                openDialog.InitialDirectory = rutaLocal;
+            }
 
             if (openDialog.ShowDialog(this) == true)
             {
-                LocalDirectoryTextBox.Text = openDialog.SelectedPath;
-                rutaLocal = openDialog.SelectedPath;
-            }
-            else
-            {
-                MessageBox.Show("Error al seleccionar el directorio, intente de nuevo...");
+                archivosSeleccionadosParaSubir = openDialog.FileNames;
+
+                // Mostrar solo el directorio
+                LocalDirectoryTextBox.Text = Path.GetDirectoryName(openDialog.FileName);
+                rutaLocal = LocalDirectoryTextBox.Text ?? "C:";
+
+                if (archivosSeleccionadosParaSubir.Length == 1)
+                {
+                    ManualPathTextBox.Text = Path.GetFileName(openDialog.FileName);
+                }
+                else
+                {
+                    ManualPathTextBox.Text = $"<{archivosSeleccionadosParaSubir.Length} archivos seleccionados>";
+                }
             }
         }
 
@@ -115,6 +129,24 @@ namespace File_Wizard.UI.Wpf
                 return;
             }
 
+            // Subida múltiple (por Botón Browse)
+            if (archivosSeleccionadosParaSubir != null && archivosSeleccionadosParaSubir.Length > 0 && 
+                ManualPathTextBox.Text.StartsWith("<") && ManualPathTextBox.Text.EndsWith("archivos seleccionados>"))
+            {
+                int correctos = 0;
+                foreach (string ruta in archivosSeleccionadosParaSubir)
+                {
+                    if (File.Exists(ruta))
+                    {
+                        SubirArchivo(ruta, mostrarMsg: false);
+                        if (subidaCorrecta) correctos++;
+                    }
+                }
+                MessageBox.Show($"Proceso finalizado. Subidos correctamente: {correctos} de {archivosSeleccionadosParaSubir.Length}.");
+                return;
+            }
+
+            // Subida individual o manual
             if (string.IsNullOrWhiteSpace(ManualPathTextBox.Text))
             {
                 MessageBox.Show("No se han escrito los elementos para descargar");
@@ -131,7 +163,7 @@ namespace File_Wizard.UI.Wpf
             string rutaCompleta = Path.Combine(LocalDirectoryTextBox.Text.Trim(), archivo);
             if (File.Exists(rutaCompleta))
             {
-                SubirArchivo(rutaCompleta);
+                SubirArchivo(rutaCompleta, mostrarMsg: true);
             }
             else
             {
@@ -139,7 +171,7 @@ namespace File_Wizard.UI.Wpf
             }
         }
 
-        private void SubirArchivo(string rutaLocalCompleta)
+        private void SubirArchivo(string rutaLocalCompleta, bool mostrarMsg = true)
         {
             string archivo = Path.GetFileName(rutaLocalCompleta);
             string extension = Path.GetExtension(archivo);
@@ -196,13 +228,24 @@ namespace File_Wizard.UI.Wpf
                 using FileStream fs = new FileStream(rutaLocalCompleta, FileMode.Open);
                 client.UploadFile(fs, rutaCompletaRemota);
 
+                // Cambiar los permisos a todos en Linux del archivo que acabamos de crear/sobreescribir. (chmod 777)
+                try
+                {
+                    client.ChangePermissions(rutaCompletaRemota, 0777); // 777 as in read/write/execute for all
+                }
+                catch (Exception chmodEx)
+                {
+                    // Atrapamos unicamente si el cambio de permisos falla. Quizás el usuario no tiene de privilegios para hacer "chmod".
+                    if (mostrarMsg) MessageBox.Show("El archivo se subió, pero hubo un problema otorgando todos los permisos (chmod 777):\n" + chmodEx.Message);
+                }
+
                 subidaCorrecta = true;
-                MessageBox.Show("El archivo se subió correctamente :)");
+                if (mostrarMsg) MessageBox.Show("El archivo se subió correctamente y se han dado todos los permisos (Chmod 777) :)");
             }
             catch
             {
                 subidaCorrecta = false;
-                MessageBox.Show("ERROR AL SUBIR EL ARCHIVO: " + archivo);
+                if (mostrarMsg) MessageBox.Show("ERROR AL SUBIR EL ARCHIVO: " + archivo);
             }
         }
 
@@ -240,7 +283,7 @@ namespace File_Wizard.UI.Wpf
                         return;
                     }
 
-                    SubirArchivo(rutaCompletaLocal);
+                    SubirArchivo(rutaCompletaLocal, mostrarMsg: true);
                     if (subidaCorrecta)
                     {
                         commandHistory.Add(rutaCompletaRemota);

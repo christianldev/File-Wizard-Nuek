@@ -2,14 +2,20 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="DESA-TEST Uploader"
-        Width="628"
-        Height="314"
+        Width="640"
+        Height="360"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Background="#FFF5F7FC"
+        Background="#FFF5F8FC"
         FontFamily="Segoe UI"
         Closing="Window_Closing">
-    <Grid Margin="22">
+    <Window.Resources>
+        <!-- Estilo básico sin bordes redondeados (CornerRadius no lo soporta el Button nativo en algunas versiones) -->
+        <Style TargetType="Button">
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+    </Window.Resources>
+    <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -19,32 +25,38 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="178" />
+            <ColumnDefinition Width="180" />
             <ColumnDefinition Width="10" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="10" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Directorio LOCAL:" FontSize="14" FontWeight="Bold" Foreground="White" />
-        <Button Grid.Row="0" Grid.Column="2" x:Name="BrowseButton" Width="96" Height="24" Content="..." Click="BrowseButton_Click" />
-        <TextBox Grid.Row="0" Grid.Column="4" x:Name="LocalDirectoryTextBox" Height="66" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" />
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Directorio LOCAL:" FontSize="14" FontWeight="SemiBold" Foreground="#131C2E" VerticalAlignment="Center" />
+        <!-- Se quita CornerRadius del botón nativo -->
+        <Button Grid.Row="0" Grid.Column="2" x:Name="BrowseButton" Width="96" Height="28" Content="..." Click="BrowseButton_Click" Background="#E1E5ED" />
+        <TextBox Grid.Row="0" Grid.Column="4" x:Name="LocalDirectoryTextBox" Height="66" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="White" BorderBrush="#D1D5DB" />
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,12,0,0" Text="Archivos remotos:" FontSize="14" FontWeight="Bold" Foreground="White" />
-        <Button Grid.Row="1" Grid.Column="2" Margin="0,12,0,0" x:Name="ConnectButton" Width="117" Height="24" Content="CONECTAR" Click="ConnectButton_Click" />
-        <TextBlock Grid.Row="1" Grid.Column="4" Margin="0,12,0,0" x:Name="ConnectionStatusText" Height="16" Width="120" Background="Tomato" Foreground="White" Text="DESCONECTADO" TextAlignment="Center" FontWeight="Bold" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,16,0,0" Text="Archivos remotos:" FontSize="14" FontWeight="SemiBold" Foreground="#131C2E" VerticalAlignment="Center" />
+        <Button Grid.Row="1" Grid.Column="2" Margin="0,16,0,0" x:Name="ConnectButton" Width="117" Height="28" Content="CONECTAR" Click="ConnectButton_Click" Background="#1F6FEB" Foreground="White" Cursor="Hand" />
+        
+        <!-- En WPF nativo puede ser exigente con CornerRadius, usamos una forma alternativa -->
+        <Border Grid.Row="1" Grid.Column="4" Margin="0,16,0,0" Height="24" Width="120" Background="#FF6B6B" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <TextBlock x:Name="ConnectionStatusText" Text="DESCONECTADO" Foreground="White" TextAlignment="Center" FontWeight="SemiBold" VerticalAlignment="Center" FontSize="11" />
+        </Border>
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,16,0,0" Text="Subida Intelig.:" FontSize="14" FontWeight="Bold" Foreground="White" />
-        <StackPanel Grid.Row="2" Grid.Column="4" Margin="0,16,0,0" Orientation="Horizontal">
-            <RadioButton x:Name="DesaRadioButton" Content="SATCDPDESA" IsChecked="True" Margin="0,0,16,0" />
-            <RadioButton x:Name="TestRadioButton" Content="SATCDPTEST" />
+        <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,20,0,0" Text="Subida Intelig.:" FontSize="14" FontWeight="SemiBold" Foreground="#131C2E" VerticalAlignment="Center" />
+        <StackPanel Grid.Row="2" Grid.Column="4" Margin="0,20,0,0" Orientation="Horizontal" VerticalAlignment="Center">
+            <RadioButton x:Name="DesaRadioButton" Content="SATCDPDESA" IsChecked="True" Margin="0,0,16,0" Foreground="#374151" />
+            <RadioButton x:Name="TestRadioButton" Content="SATCDPTEST" Foreground="#374151" />
         </StackPanel>
 
-        <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,16,0,0" Text="Subida manual" FontSize="14" FontWeight="Bold" Foreground="White" />
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="(escribir ruta completa y nombre del archivo)" FontSize="14" FontWeight="Bold" Foreground="White" />
-        <TextBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" x:Name="ManualPathTextBox" Margin="0,8,0,0" Height="22" Text="/sat/cdp/desa/dat/MPJ01010.FLOG0064" KeyDown="ManualPathTextBox_KeyDown" Foreground="Blue" />
-        <Button Grid.Row="5" Grid.Column="4" x:Name="UploadButton" Width="88" Height="57" Content="UPLOAD" Click="UploadFileButton_Click" />
+        <Button Grid.Row="2" Grid.Column="2" x:Name="UploadFileButton" Margin="0,20,0,0" Width="106" Height="36" Content="SUBIR ARCHIVO" Click="UploadFileButton_Click" Background="#10B981" Foreground="White" FontWeight="SemiBold" Cursor="Hand" />
 
-        <Button Grid.Row="2" Grid.Column="2" x:Name="UploadFileButton" Margin="0,16,0,0" Width="106" Height="50" Content="SUBIR ARCHIVO" Click="UploadFileButton_Click" />
+        <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,24,0,0" Text="Subida manual" FontSize="14" FontWeight="SemiBold" Foreground="#131C2E" />
+        <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Text="(escribir ruta completa y nombre del archivo)" FontSize="11" Foreground="#606C81" />
+        
+        <TextBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" x:Name="ManualPathTextBox" Margin="0,10,0,0" Height="28" Text="/sat/cdp/desa/dat/MPJ01010.FLOG0064" KeyDown="ManualPathTextBox_KeyDown" Foreground="#2563EB" VerticalContentAlignment="Center" Padding="4,0" BorderBrush="#D1D5DB" />
+        <Button Grid.Row="5" Grid.Column="4" x:Name="UploadButton" Margin="0,10,0,0" Width="120" Height="28" HorizontalAlignment="Left" Content="UPLOAD MANUAL" Click="UploadFileButton_Click" Background="#6B7280" Foreground="White" />
     </Grid>
 </Window>
