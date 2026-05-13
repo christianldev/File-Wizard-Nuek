@@ -1,0 +1,110 @@
+<Window x:Class="File_Wizard.UI.Wpf.MainMenuWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="File Wizard"
+        Width="720"
+        Height="480"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#FFF5F8FC"
+        FontFamily="Segoe UI">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="110" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="#131C2E" Padding="28,20,28,18">
+            <StackPanel>
+                <TextBlock Text="File Wizard"
+                           FontSize="24"
+                           FontWeight="SemiBold"
+                           Foreground="White" />
+                <TextBlock Text="Transferencias organizadas por ambiente y operación"
+                           Margin="0,6,0,0"
+                           FontSize="10.5"
+                           Foreground="#AFBCD2" />
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="24,24,24,18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Row="0"
+                    Grid.Column="0"
+                    Height="108"
+                    Margin="0,0,0,16"
+                    Padding="18,14"
+                    Background="#1F6FEB"
+                    Foreground="White"
+                    BorderThickness="0"
+                    FontSize="11"
+                    FontWeight="SemiBold"
+                    HorizontalContentAlignment="Left"
+                    VerticalContentAlignment="Center"
+                    Click="DTdownbutton_Click"
+                    Content="DESA-TEST DOWNLOADER&#10;Descargar archivos del entorno DESA-TEST" />
+
+            <Button Grid.Row="0"
+                    Grid.Column="2"
+                    Height="108"
+                    Margin="0,0,0,16"
+                    Padding="18,14"
+                    Background="#1CA389"
+                    Foreground="White"
+                    BorderThickness="0"
+                    FontSize="11"
+                    FontWeight="SemiBold"
+                    HorizontalContentAlignment="Left"
+                    VerticalContentAlignment="Center"
+                    Click="DTuploadbutton_Click"
+                    Content="DESA-TEST UPLOADER&#10;Subir archivos al entorno DESA-TEST" />
+
+            <Button Grid.Row="1"
+                    Grid.Column="0"
+                    Height="108"
+                    Margin="0,0,0,16"
+                    Padding="18,14"
+                    Background="#0F172A"
+                    Foreground="White"
+                    BorderThickness="0"
+                    FontSize="11"
+                    FontWeight="SemiBold"
+                    HorizontalContentAlignment="Left"
+                    VerticalContentAlignment="Center"
+                    Click="QAdownbutton_Click"
+                    Content="QA DOWNLOADER&#10;Descargar archivos de ambientes QA" />
+
+            <Button Grid.Row="1"
+                    Grid.Column="2"
+                    Height="108"
+                    Margin="0,0,0,16"
+                    Padding="18,14"
+                    Background="#F59E0B"
+                    Foreground="White"
+                    BorderThickness="0"
+                    FontSize="11"
+                    FontWeight="SemiBold"
+                    HorizontalContentAlignment="Left"
+                    VerticalContentAlignment="Center"
+                    Click="QAuploadbutton_Click"
+                    Content="QA UPLOADER&#10;Subir archivos a entornos QA" />
+
+            <TextBlock Grid.Row="2"
+                       Grid.ColumnSpan="3"
+                       VerticalAlignment="Bottom"
+                       Foreground="#606C81"
+                       FontSize="9"
+                       Text="Selecciona una operación para continuar con File Wizard" />
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,65 @@
+<Window x:Class="File_Wizard.UI.Wpf.QaDownloadWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="QASSUR Downloader"
+        Width="672"
+        Height="456"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#FFF5F7FC"
+        FontFamily="Segoe UI"
+        Closing="Window_Closing">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="182" />
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="117" />
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Directorio LOCAL:" FontSize="14" FontWeight="Bold" Foreground="White" />
+        <Button Grid.Row="0" Grid.Column="2" x:Name="BrowseButton" Width="96" Height="24" Content="..." Click="BrowseButton_Click" />
+        <TextBox Grid.Row="0" Grid.Column="4" x:Name="LocalDirectoryTextBox" Height="66" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" />
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,8,0,0" Text="Archivos remotos:" FontSize="14" FontWeight="Bold" Foreground="White" />
+        <Button Grid.Row="1" Grid.Column="2" Margin="0,8,0,0" x:Name="ConnectButton" Width="117" Height="24" Content="CONECTAR" Click="ConnectButton_Click" />
+        <TextBlock Grid.Row="1" Grid.Column="4" Margin="0,8,0,0" x:Name="ConnectionStatusText" Height="16" Width="120" Background="Tomato" Foreground="White" Text="DESCONECTADO" TextAlignment="Center" FontWeight="Bold" />
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,14,0,0" Text="Ambiente" FontSize="14" FontWeight="Bold" Foreground="White" />
+        <StackPanel Grid.Row="2" Grid.Column="4" Margin="0,14,0,0" Orientation="Vertical">
+            <RadioButton x:Name="Environment1RadioButton" Content="SATQANEXC(CERTIF)" IsChecked="True" />
+            <RadioButton x:Name="Environment2RadioButton" Content="SATQANEXUS(COMUNI)" />
+            <RadioButton x:Name="Environment3RadioButton" Content="SATBCNXQA(BCHILE)" />
+            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                <RadioButton x:Name="OtherEnvironmentRadioButton" Content="OTRO (ESPECIFICAR)" Checked="OtherEnvironmentRadioButton_Checked" Unchecked="OtherEnvironmentRadioButton_Unchecked" />
+                <TextBox x:Name="OtherEnvironmentTextBox" Width="160" Height="20" Margin="10,0,0,0" Visibility="Collapsed" Text="Ejem: satitanxqa (sin barras)" />
+            </StackPanel>
+        </StackPanel>
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,18,0,0" Text="Subida/descarga manual" FontSize="14" FontWeight="Bold" Foreground="White" />
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="(escribir ruta completa y nombre del archivo)" FontSize="14" FontWeight="Bold" Foreground="White" />
+        <TextBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" x:Name="ManualPathTextBox" Margin="0,8,0,0" Height="20" Text="/satqanexc/dat/MPJ01010.FLOG0064" KeyDown="ManualPathTextBox_KeyDown" Foreground="Blue" />
+        <Button Grid.Row="5" Grid.Column="4" x:Name="ManualDownloadButton" Width="153" Height="57" Content="DESCARGAR" Click="ManualDownloadButton_Click" />
+
+        <Button Grid.Row="2" Grid.Column="2" x:Name="DownloadListButton" Margin="0,42,0,0" Width="117" Height="79" Content="DESCARGAR ARCHIVOS" Click="DownloadListButton_Click" />
+        <Button Grid.Row="3" Grid.Column="2" x:Name="CancelButton" Margin="0,10,0,0" Width="153" Height="33" Content="CANCELAR" Background="Tomato" Foreground="White" Click="CancelButton_Click" />
+        <Button Grid.Row="3" Grid.Column="4" x:Name="ClearCacheButton" Width="85" Height="48" Content="LIMPIAR CACHÉ" Click="ClearCacheButton_Click" />
+
+        <ProgressBar Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2" x:Name="DownloadProgressBar" Height="23" Visibility="Collapsed" Minimum="0" Maximum="100" Margin="0,34,0,0" />
+        <TextBlock Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2" x:Name="CurrentItemTextBlock" Margin="0,10,0,0" Foreground="White" FontWeight="Bold" />
+        <TextBlock Grid.Row="4" Grid.Column="4" x:Name="ResultTextBlock" Margin="0,10,0,0" Foreground="White" FontWeight="Bold" />
+
+        <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="1" x:Name="FilesTextBox" Margin="0,2,0,0" Height="189" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" />
+        <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,195,0,0" Text="(una línea por archivo o patrón)" Foreground="White" FontSize="11" />
+        <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,34,0,0" x:Name="StatusDetailsTextBlock" Foreground="White" />
+    </Grid>
+</Window>

@@ -1,0 +1,328 @@
+using File_Wizard.Infrastructure;
+using Renci.SshNet;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Runtime.Versioning;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Threading;
+using Ookii.Dialogs.Wpf;
+
+namespace File_Wizard.UI.Wpf
+{
+    [SupportedOSPlatform("windows")]
+    public partial class DesaTestUploadWindow : Window
+    {
+        private readonly SftpConnectionSettings connectionSettings;
+        private readonly List<string> commandHistory = new List<string>();
+        private readonly DispatcherTimer connectionTimer = new DispatcherTimer();
+
+        private SftpClient? client;
+        private bool subidaCorrecta;
+        private string rutaLocal = @"C:";
+        private int historyIndex = -1;
+        private string directorio = "/sat/cdp/desa/cpy";
+
+        public DesaTestUploadWindow(SftpConnectionSettings connectionSettings)
+        {
+            this.connectionSettings = connectionSettings ?? throw new ArgumentNullException(nameof(connectionSettings));
+            InitializeComponent();
+
+            connectionTimer.Interval = TimeSpan.FromSeconds(5);
+            connectionTimer.Tick += Timer_Tick;
+        }
+
+        private void Window_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            connectionTimer.Stop();
+
+            if (client != null && client.IsConnected)
+            {
+                client.Disconnect();
+            }
+        }
+
+        private void BrowseButton_Click(object sender, RoutedEventArgs e)
+        {
+            var openDialog = new VistaFolderBrowserDialog
+            {
+                SelectedPath = rutaLocal,
+                Description = "Selecciona el directorio donde se encuentran los componentes...",
+                UseDescriptionForTitle = true,
+                ShowNewFolderButton = true
+            };
+
+            if (openDialog.ShowDialog(this) == true)
+            {
+                LocalDirectoryTextBox.Text = openDialog.SelectedPath;
+                rutaLocal = openDialog.SelectedPath;
+            }
+            else
+            {
+                MessageBox.Show("Error al seleccionar el directorio, intente de nuevo...");
+            }
+        }
+
+        private void ConnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                client = new SftpClient(connectionSettings.Host, connectionSettings.Port, connectionSettings.Username, connectionSettings.Password);
+                client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(8);
+                client.Connect();
+
+                if (client.IsConnected)
+                {
+                    connectionTimer.Start();
+                    ConnectionStatusText.Text = "CONECTADO";
+                    ConnectionStatusText.Background = System.Windows.Media.Brushes.LimeGreen;
+                    UploadFileButton.IsEnabled = true;
+                    UploadButton.IsEnabled = true;
+                    SetConnectedState();
+                }
+                else
+                {
+                    MessageBox.Show("CONEXION fallida");
+                    SetDisconnectedState();
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Error en la conexion");
+                SetDisconnectedState();
+            }
+        }
+
+        private void UploadFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (client == null || !client.IsConnected)
+            {
+                MessageBox.Show("NO HAY CONEXION CON EL SERVIDOR");
+                return;
+            }
+
+            if (!DesaRadioButton.IsChecked.GetValueOrDefault() && !TestRadioButton.IsChecked.GetValueOrDefault())
+            {
+                MessageBox.Show("Por favor, elegir un ambiente: DESA o TEST");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(LocalDirectoryTextBox.Text))
+            {
+                MessageBox.Show("Selecciona un directorio :)");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(ManualPathTextBox.Text))
+            {
+                MessageBox.Show("No se han escrito los elementos para descargar");
+                return;
+            }
+
+            string archivo = ManualPathTextBox.Text.Trim();
+            if (archivo.Contains("/") || archivo.Contains("?"))
+            {
+                MessageBox.Show("El nombre del archivo a subir tiene caracteres no permitidos: * ?");
+                return;
+            }
+
+            string rutaCompleta = Path.Combine(LocalDirectoryTextBox.Text.Trim(), archivo);
+            if (File.Exists(rutaCompleta))
+            {
+                SubirArchivo(rutaCompleta);
+            }
+            else
+            {
+                MessageBox.Show("El archivo local ingresado no existe :(");
+            }
+        }
+
+        private void SubirArchivo(string rutaLocalCompleta)
+        {
+            string archivo = Path.GetFileName(rutaLocalCompleta);
+            string extension = Path.GetExtension(archivo);
+            bool hubodirectorio = true;
+
+            if (DesaRadioButton.IsChecked == true)
+            {
+                switch (extension)
+                {
+                    case ".sh": directorio = "/sat/cdp/desa/cad"; break;
+                    case ".cbl":
+                    case ".pco": directorio = "/sat/cdp/desa/src"; break;
+                    case ".scl": directorio = "/sat/cdp/desa/cad/scl"; break;
+                    case ".fact": directorio = "/sat/cdp/desa/adm/fact"; break;
+                    case ".sql": directorio = "/sat/cdp/desa/adm/sql"; break;
+                    case "": directorio = "/sat/cdp/desa/cpy"; break;
+                    default: hubodirectorio = false; break;
+                }
+            }
+            else
+            {
+                switch (extension)
+                {
+                    case ".sh": directorio = "/sat/cdp/test/cad"; break;
+                    case ".cbl":
+                    case ".pco": directorio = "/sat/cdp/test/src"; break;
+                    case ".scl": directorio = "/sat/cdp/test/cad/scl"; break;
+                    case ".fact": directorio = "/sat/cdp/test/adm/fact"; break;
+                    case ".sql": directorio = "/sat/cdp/test/adm/sql"; break;
+                    case "": directorio = "/sat/cdp/test/cpy"; break;
+                    default: hubodirectorio = false; break;
+                }
+            }
+
+            if (!hubodirectorio)
+            {
+                MessageBox.Show("Error - No se encontró directorio válido para el archivo: " + archivo);
+                return;
+            }
+
+            try
+            {
+                string rutaCompletaRemota = directorio + "/" + archivo;
+                if (client!.Exists(rutaCompletaRemota))
+                {
+                    if (MessageBox.Show("¿Estás seguro de sobreescribir este archivo?", "CONFIRMACION", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                    {
+                        MessageBox.Show("SUBIDA CANCELADA POR EL USUARIO");
+                        subidaCorrecta = false;
+                        return;
+                    }
+                }
+
+                using FileStream fs = new FileStream(rutaLocalCompleta, FileMode.Open);
+                client.UploadFile(fs, rutaCompletaRemota);
+
+                subidaCorrecta = true;
+                MessageBox.Show("El archivo se subió correctamente :)");
+            }
+            catch
+            {
+                subidaCorrecta = false;
+                MessageBox.Show("ERROR AL SUBIR EL ARCHIVO: " + archivo);
+            }
+        }
+
+        private void ManualPathTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if (client == null || !client.IsConnected)
+                {
+                    MessageBox.Show("NO HAY CONEXION CON EL SERVIDOR");
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(ManualPathTextBox.Text))
+                {
+                    MessageBox.Show("No se han escrito los elementos para subir");
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(LocalDirectoryTextBox.Text))
+                {
+                    MessageBox.Show("Selecciona un directorio :)");
+                    return;
+                }
+
+                string rutaCompletaRemota = ManualPathTextBox.Text.Trim();
+                if (rutaCompletaRemota.Contains("/") && rutaCompletaRemota.StartsWith("/") && !rutaCompletaRemota.EndsWith("/")
+                    && !rutaCompletaRemota.Contains("*") && !rutaCompletaRemota.Contains("?"))
+                {
+                    string archivo = Path.GetFileName(ManualPathTextBox.Text.Trim());
+                    string rutaCompletaLocal = Path.Combine(LocalDirectoryTextBox.Text.Trim(), archivo);
+                    if (!File.Exists(rutaCompletaLocal))
+                    {
+                        MessageBox.Show("El archivo que se desea subir no existe en el directorio local :(");
+                        return;
+                    }
+
+                    SubirArchivo(rutaCompletaLocal);
+                    if (subidaCorrecta)
+                    {
+                        commandHistory.Add(rutaCompletaRemota);
+                        historyIndex = commandHistory.Count;
+                        ManualPathTextBox.Clear();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("La ruta del fichero a subir no es correcta");
+                }
+
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Up)
+            {
+                if (commandHistory.Count == 0)
+                {
+                    return;
+                }
+
+                historyIndex--;
+                if (historyIndex < 0)
+                {
+                    historyIndex = 0;
+                }
+
+                ManualPathTextBox.Text = commandHistory[historyIndex];
+                ManualPathTextBox.CaretIndex = ManualPathTextBox.Text.Length;
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Down)
+            {
+                if (commandHistory.Count == 0)
+                {
+                    return;
+                }
+
+                historyIndex++;
+                if (historyIndex >= commandHistory.Count)
+                {
+                    historyIndex = commandHistory.Count;
+                    ManualPathTextBox.Clear();
+                }
+                else
+                {
+                    ManualPathTextBox.Text = commandHistory[historyIndex];
+                    ManualPathTextBox.CaretIndex = ManualPathTextBox.Text.Length;
+                }
+
+                e.Handled = true;
+            }
+        }
+
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+            if (client == null || !client.IsConnected)
+            {
+                connectionTimer.Stop();
+                ConnectionStatusText.Text = "DESCONECTADO";
+                ConnectionStatusText.Background = System.Windows.Media.Brushes.Tomato;
+                SetDisconnectedState();
+                MessageBox.Show("SE PERDIO LA CONEXION CON EL SERVIDOR");
+            }
+        }
+
+        private void SetConnectedState()
+        {
+            ConnectButton.IsEnabled = false;
+            UploadFileButton.IsEnabled = true;
+            UploadButton.IsEnabled = true;
+            BrowseButton.IsEnabled = true;
+        }
+
+        private void SetDisconnectedState()
+        {
+            ConnectionStatusText.Text = "DESCONECTADO";
+            ConnectionStatusText.Background = System.Windows.Media.Brushes.Tomato;
+            ConnectButton.IsEnabled = true;
+            UploadFileButton.IsEnabled = false;
+            UploadButton.IsEnabled = false;
+            BrowseButton.IsEnabled = true;
+        }
+    }
+}

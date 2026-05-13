@@ -1,0 +1,50 @@
+<Window x:Class="File_Wizard.UI.Wpf.DesaTestUploadWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DESA-TEST Uploader"
+        Width="628"
+        Height="314"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#FFF5F7FC"
+        FontFamily="Segoe UI"
+        Closing="Window_Closing">
+    <Grid Margin="22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="178" />
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Directorio LOCAL:" FontSize="14" FontWeight="Bold" Foreground="White" />
+        <Button Grid.Row="0" Grid.Column="2" x:Name="BrowseButton" Width="96" Height="24" Content="..." Click="BrowseButton_Click" />
+        <TextBox Grid.Row="0" Grid.Column="4" x:Name="LocalDirectoryTextBox" Height="66" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" />
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,12,0,0" Text="Archivos remotos:" FontSize="14" FontWeight="Bold" Foreground="White" />
+        <Button Grid.Row="1" Grid.Column="2" Margin="0,12,0,0" x:Name="ConnectButton" Width="117" Height="24" Content="CONECTAR" Click="ConnectButton_Click" />
+        <TextBlock Grid.Row="1" Grid.Column="4" Margin="0,12,0,0" x:Name="ConnectionStatusText" Height="16" Width="120" Background="Tomato" Foreground="White" Text="DESCONECTADO" TextAlignment="Center" FontWeight="Bold" />
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,16,0,0" Text="Subida Intelig.:" FontSize="14" FontWeight="Bold" Foreground="White" />
+        <StackPanel Grid.Row="2" Grid.Column="4" Margin="0,16,0,0" Orientation="Horizontal">
+            <RadioButton x:Name="DesaRadioButton" Content="SATCDPDESA" IsChecked="True" Margin="0,0,16,0" />
+            <RadioButton x:Name="TestRadioButton" Content="SATCDPTEST" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,16,0,0" Text="Subida manual" FontSize="14" FontWeight="Bold" Foreground="White" />
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="(escribir ruta completa y nombre del archivo)" FontSize="14" FontWeight="Bold" Foreground="White" />
+        <TextBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" x:Name="ManualPathTextBox" Margin="0,8,0,0" Height="22" Text="/sat/cdp/desa/dat/MPJ01010.FLOG0064" KeyDown="ManualPathTextBox_KeyDown" Foreground="Blue" />
+        <Button Grid.Row="5" Grid.Column="4" x:Name="UploadButton" Width="88" Height="57" Content="UPLOAD" Click="UploadFileButton_Click" />
+
+        <Button Grid.Row="2" Grid.Column="2" x:Name="UploadFileButton" Margin="0,16,0,0" Width="106" Height="50" Content="SUBIR ARCHIVO" Click="UploadFileButton_Click" />
+    </Grid>
+</Window>
