@@ -196,8 +196,65 @@ namespace File_Wizard.UI.Wpf
                         case ".scl": directorio = "/sat/cdp/desa/cad/scl"; break;
                         case ".fact": directorio = "/sat/cdp/desa/adm/fact"; break;
                         case ".sql": directorio = "/sat/cdp/desa/adm/sql"; break;
-                        case "": directorio = "/sat/cdp/desa/cpy"; break;
-                        default: hubodirectorio = false; break;
+                        case "":
+                            {
+                                string name = linea.Trim();
+                                string datPath = "/sat/cdp/desa/dat/" + name;
+                                string cpyPath = "/sat/cdp/desa/cpy/" + name;
+                                try
+                                {
+                                    if (client != null && client.IsConnected && client.Exists(datPath))
+                                    {
+                                        directorio = "/sat/cdp/desa/dat";
+                                    }
+                                    else if (client != null && client.IsConnected && client.Exists(cpyPath))
+                                    {
+                                        directorio = "/sat/cdp/desa/cpy";
+                                    }
+                                    else
+                                    {
+                                        directorio = Regex.IsMatch(name, @"^(NG|MP|GO)") ? "/sat/cdp/desa/dat" : "/sat/cdp/desa/cpy";
+                                    }
+                                }
+                                catch
+                                {
+                                    directorio = "/sat/cdp/desa/cpy";
+                                }
+                            }
+                            break;
+                        default:
+                            {
+                                string name = linea.Trim();
+                                if (Regex.IsMatch(name, @"^(NG|MP|GO)"))
+                                {
+                                    string datPath = "/sat/cdp/desa/dat/" + name;
+                                    string cpyPath = "/sat/cdp/desa/cpy/" + name;
+                                    try
+                                    {
+                                        if (client != null && client.IsConnected && client.Exists(datPath))
+                                        {
+                                            directorio = "/sat/cdp/desa/dat";
+                                        }
+                                        else if (client != null && client.IsConnected && client.Exists(cpyPath))
+                                        {
+                                            directorio = "/sat/cdp/desa/cpy";
+                                        }
+                                        else
+                                        {
+                                            directorio = "/sat/cdp/desa/dat"; // default to dat when pattern present
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        hubodirectorio = false;
+                                    }
+                                }
+                                else
+                                {
+                                    hubodirectorio = false;
+                                }
+                            }
+                            break;
                     }
                 }
                 else
@@ -211,8 +268,27 @@ namespace File_Wizard.UI.Wpf
                         case ".scl": directorio = "/sat/cdp/test/cad/scl"; break;
                         case ".fact": directorio = "/sat/cdp/test/adm/fact"; break;
                         case ".sql": directorio = "/sat/cdp/test/adm/sql"; break;
-                        case "": directorio = "/sat/cdp/test/cpy"; break;
-                        default: hubodirectorio = false; break;
+                        case "":
+                            // Try to detect if the file has a specific format without extension meant for /dat/
+                            if (Regex.IsMatch(linea.Trim(), @"^(NG|MP|GO)\d+\.F[A-Z0-9]+$"))
+                            {
+                                directorio = "/sat/cdp/test/dat";
+                            }
+                            else
+                            {
+                                directorio = "/sat/cdp/test/cpy";
+                            }
+                            break;
+                        default:
+                            if (Regex.IsMatch(linea.Trim(), @"^(NG|MP|GO)\d+\.F[A-Z0-9]+$"))
+                            {
+                                directorio = "/sat/cdp/test/dat";
+                            }
+                            else
+                            {
+                                hubodirectorio = false;
+                            }
+                            break;
                     }
                 }
 
@@ -231,51 +307,108 @@ namespace File_Wizard.UI.Wpf
                 }
 
                 string archivoSimple = linea.Trim();
-                string rutaRemotaCompleta = directorio + "/" + archivoSimple;
+                string rutaRemotaCompleta;
+
+                // Build list of remote paths to process. If user provided absolute path, just that one.
+                var rutasAProcesar = new List<string>();
+
+                if (archivoSimple.StartsWith("/"))
+                {
+                    rutaRemotaCompleta = archivoSimple;
+                    archivoSimple = Path.GetFileName(archivoSimple);
+                    rutasAProcesar.Add(rutaRemotaCompleta);
+                }
+                else
+                {
+                    rutaRemotaCompleta = directorio + "/" + archivoSimple;
+
+                    // If name may exist in both dat and cpy, check both and register both when found
+                    try
+                    {
+                        string baseDir = directorio;
+                        int idx = directorio.LastIndexOf('/');
+                        if (idx > 0)
+                        {
+                            baseDir = directorio.Substring(0, idx);
+                        }
+
+                        string datPath = baseDir + "/dat/" + archivoSimple;
+                        string cpyPath = baseDir + "/cpy/" + archivoSimple;
+
+                        bool datExists = client != null && client.IsConnected && client.Exists(datPath);
+                        bool cpyExists = client != null && client.IsConnected && client.Exists(cpyPath);
+
+                        if (datExists && cpyExists)
+                        {
+                            rutasAProcesar.Add(datPath);
+                            rutasAProcesar.Add(cpyPath);
+                        }
+                        else
+                        {
+                            rutasAProcesar.Add(rutaRemotaCompleta);
+                        }
+                    }
+                    catch
+                    {
+                        // On error, fallback to the originally computed path
+                        rutasAProcesar.Add(rutaRemotaCompleta);
+                    }
+                }
 
                 try
                 {
-                    if (!client!.Exists(rutaRemotaCompleta))
+                    foreach (var rutaActual in rutasAProcesar)
                     {
-                        Dispatcher.Invoke(() => MessageBox.Show("No existe el archivo: " + archivoSimple));
-                        continue;
-                    }
-
-                    var atributos = client.GetAttributes(rutaRemotaCompleta);
-                    localFilePath = Path.Combine(localDirectory, prefijo + archivoSimple);
-                    using Stream filestream = File.Create(localFilePath);
-                    ulong totalBytesDownloaded = 0;
-
-                    client.DownloadFile(rutaRemotaCompleta, filestream, bytesRead =>
-                    {
-                        if (cancelarDescarga)
+                        if (!client!.Exists(rutaActual))
                         {
-                            return;
+                            Dispatcher.Invoke(() => MessageBox.Show("No existe el archivo: " + Path.GetFileName(rutaActual)));
+                            continue;
                         }
 
-                        totalBytesDownloaded += bytesRead;
+                        var atributos = client.GetAttributes(rutaActual);
+
+                        // When downloading multiple sources with same filename, add a directory label to avoid overwrite
+                        string archivoLocal = archivoSimple;
+                        if (rutasAProcesar.Count > 1)
+                        {
+                            if (rutaActual.Contains("/dat/")) archivoLocal = "dat-" + archivoSimple;
+                            else if (rutaActual.Contains("/cpy/")) archivoLocal = "cpy-" + archivoSimple;
+                            else archivoLocal = Path.GetFileName(rutaActual);
+                        }
+
+                        localFilePath = Path.Combine(localDirectory, prefijo + archivoLocal);
+                        using Stream filestream = File.Create(localFilePath);
+                        ulong totalBytesDownloaded = 0;
+
+                        client.DownloadFile(rutaActual, filestream, bytesRead =>
+                        {
+                            if (cancelarDescarga)
+                            {
+                                return;
+                            }
+
+                            totalBytesDownloaded += bytesRead;
+                            Dispatcher.Invoke(() =>
+                            {
+                                DownloadProgressBar.Visibility = Visibility.Visible;
+                                DownloadProgressBar.Maximum = Math.Max(1, (long)atributos.Size);
+                                DownloadProgressBar.Value = Math.Min((double)totalBytesDownloaded, DownloadProgressBar.Maximum);
+                                CurrentFileTextBlock.Text = archivoLocal;
+                            });
+                        });
+
+                        numlineasOK++;
+
                         Dispatcher.Invoke(() =>
                         {
-                            DownloadProgressBar.Visibility = Visibility.Visible;
-                            DownloadProgressBar.Maximum = Math.Max(1, (long)atributos.Size);
-                            DownloadProgressBar.Value = Math.Min((double)totalBytesDownloaded, DownloadProgressBar.Maximum);
-                            CurrentFileTextBlock.Text = archivoSimple;
+                            DownloadProgressBar.Visibility = Visibility.Collapsed;
+                            CurrentFileTextBlock.Text = string.Empty;
                         });
-                    });
-
-                    numlineasOK++;
+                    }
                 }
                 catch
                 {
                     Dispatcher.Invoke(() => MessageBox.Show("Error al descargar el archivo: " + linea));
-                }
-                finally
-                {
-                    Dispatcher.Invoke(() =>
-                    {
-                        DownloadProgressBar.Visibility = Visibility.Collapsed;
-                        CurrentFileTextBlock.Text = string.Empty;
-                    });
                 }
             }
 
