@@ -8,7 +8,7 @@
         Background="#FFF5F7FC"
         FontFamily="Segoe UI"
         Closing="Window_Closing">
-    <Grid>
+    <Grid Margin="0,0,0,2">
         <Grid.RowDefinitions>
             <RowDefinition Height="151" />
             <RowDefinition Height="*" />
@@ -41,7 +41,7 @@
             </Grid>
         </Border>
 
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,0,0,136">
             <Grid Margin="21,25,21,25">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -172,11 +172,6 @@
                                         Margin="0,0,0,8"
                                         Content="Cancelar"
                                         Click="CancelButton_Click" />
-                                <Button x:Name="DownloadManualShortcutButton"
-                                        Height="34"
-                                        Margin="0,0,0,8"
-                                        Content="Descarga manual"
-                                        Click="ManualDownloadButton_Click" />
                             </StackPanel>
                         </Grid>
                     </StackPanel>

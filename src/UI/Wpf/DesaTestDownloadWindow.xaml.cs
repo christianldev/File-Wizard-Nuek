@@ -104,6 +104,8 @@ namespace File_Wizard.UI.Wpf
 
         private void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
+            Dispatcher.Invoke(() => ResultTextBlock.Text = "TRACE: DownloadButton_Click invoked");
+
             if (client == null || !client.IsConnected)
             {
                 MessageBox.Show("NO HAY CONEXION CON EL SERVIDOR");
@@ -122,12 +124,26 @@ namespace File_Wizard.UI.Wpf
                 return;
             }
 
+            // Capture UI state on the UI thread before starting background work
+            string filesText = string.Empty;
+            string localDirectory = string.Empty;
+            bool prefixChecked = false;
+            bool desaChecked = false;
+
+            Dispatcher.Invoke(() =>
+            {
+                filesText = FilesTextBox.Text;
+                localDirectory = LocalDirectoryTextBox.Text;
+                prefixChecked = PrefixCheckBox.IsChecked == true;
+                desaChecked = DesaRadioButton.IsChecked == true;
+            });
+
             cancelarDescarga = false;
             SetBusyState();
 
             var downloadThread = new Thread(() =>
             {
-                DescargarArchivos();
+                DescargarArchivos(filesText, localDirectory, prefixChecked, desaChecked);
                 Dispatcher.Invoke(SetReadyState);
             });
 
@@ -150,12 +166,12 @@ namespace File_Wizard.UI.Wpf
             return archivos;
         }
 
-        private void DescargarArchivos()
+        private void DescargarArchivos(string filesText, string localDirectory, bool prefixChecked, bool desaChecked)
         {
             int numlineas = 0;
             int numlineasOK = 0;
 
-            foreach (string linea in FilesTextBox.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None))
+            foreach (string linea in filesText.Split(new[] { Environment.NewLine }, StringSplitOptions.None))
             {
                 if (string.IsNullOrWhiteSpace(linea))
                 {
@@ -169,7 +185,7 @@ namespace File_Wizard.UI.Wpf
                 string prefijo = string.Empty;
                 bool hubodirectorio = true;
 
-                if (DesaRadioButton.IsChecked == true)
+                if (desaChecked)
                 {
                     prefijoPredict = "DESA-";
                     switch (extension)
@@ -200,7 +216,7 @@ namespace File_Wizard.UI.Wpf
                     }
                 }
 
-                prefijo = PrefixCheckBox.IsChecked == true ? prefijoPredict : string.Empty;
+                prefijo = prefixChecked ? prefijoPredict : string.Empty;
 
                 if (!hubodirectorio)
                 {
@@ -210,7 +226,7 @@ namespace File_Wizard.UI.Wpf
 
                 if (linea.Contains("*") || linea.Contains("?"))
                 {
-                    DescargarPorPatron(linea.Trim(), prefijo, ref numlineasOK);
+                    DescargarPorPatron(linea.Trim(), prefijo, ref numlineasOK, localDirectory, directorio);
                     continue;
                 }
 
@@ -221,12 +237,12 @@ namespace File_Wizard.UI.Wpf
                 {
                     if (!client!.Exists(rutaRemotaCompleta))
                     {
-                        MessageBox.Show("No existe el archivo: " + archivoSimple);
+                        Dispatcher.Invoke(() => MessageBox.Show("No existe el archivo: " + archivoSimple));
                         continue;
                     }
 
                     var atributos = client.GetAttributes(rutaRemotaCompleta);
-                    localFilePath = Path.Combine(LocalDirectoryTextBox.Text, prefijo + archivoSimple);
+                    localFilePath = Path.Combine(localDirectory, prefijo + archivoSimple);
                     using Stream filestream = File.Create(localFilePath);
                     ulong totalBytesDownloaded = 0;
 
@@ -251,7 +267,7 @@ namespace File_Wizard.UI.Wpf
                 }
                 catch
                 {
-                    MessageBox.Show("Error al descargar el archivo: " + linea);
+                    Dispatcher.Invoke(() => MessageBox.Show("Error al descargar el archivo: " + linea));
                 }
                 finally
                 {
@@ -267,22 +283,22 @@ namespace File_Wizard.UI.Wpf
             {
                 if (numlineasOK == numlineas)
                 {
-                    MessageBox.Show(numlineas == 1 ? "Archivo descargado correctmente" : "Todos los archivos fueron descargados correctamente");
-                    ResultTextBlock.Text = numlineas == 1 ? "Archivo descargado correctmente" : "Todos los archivos fueron descargados correctamente";
+                    Dispatcher.Invoke(() => MessageBox.Show(numlineas == 1 ? "Archivo descargado correctmente" : "Todos los archivos fueron descargados correctamente"));
+                    Dispatcher.Invoke(() => ResultTextBlock.Text = numlineas == 1 ? "Archivo descargado correctmente" : "Todos los archivos fueron descargados correctamente");
                 }
                 else if (numlineas > 0)
                 {
-                    MessageBox.Show("Hubo error en la descarga de 1 o más componentes");
-                    ResultTextBlock.Text = "Hubo error en la descarga de 1 o más componentes";
+                    Dispatcher.Invoke(() => MessageBox.Show("Hubo error en la descarga de 1 o más componentes"));
+                    Dispatcher.Invoke(() => ResultTextBlock.Text = "Hubo error en la descarga de 1 o más componentes");
                 }
             });
         }
 
-        private void DescargarPorPatron(string patron, string prefijo, ref int numlineasOK)
+        private void DescargarPorPatron(string patron, string prefijo, ref int numlineasOK, string localDirectory, string directorioLocal)
         {
             if (patron == "*" || patron == "?")
             {
-                MessageBox.Show("Nombre incorrecto del archivo a descargar: * ?");
+                Dispatcher.Invoke(() => MessageBox.Show("Nombre incorrecto del archivo a descargar: * ?"));
                 return;
             }
 
@@ -291,7 +307,7 @@ namespace File_Wizard.UI.Wpf
 
             try
             {
-                List<ISftpFile> archivos = ObtenerArchivosDelDirectorio(client!, directorio);
+                List<ISftpFile> archivos = ObtenerArchivosDelDirectorio(client!, directorioLocal);
 
                 foreach (ISftpFile archivo in archivos)
                 {
@@ -307,11 +323,11 @@ namespace File_Wizard.UI.Wpf
                         return;
                     }
 
-                    string localFilePath = Path.Combine(LocalDirectoryTextBox.Text, prefijo + archivo.Name);
+                    string localFilePath = Path.Combine(localDirectory, prefijo + archivo.Name);
                     using Stream filestream = File.Create(localFilePath);
                     ulong totalBytesDownloaded = 0;
 
-                    client!.DownloadFile(directorio + "/" + archivo.Name, filestream, bytesRead =>
+                    client!.DownloadFile(directorioLocal + "/" + archivo.Name, filestream, bytesRead =>
                     {
                         if (cancelarDescarga)
                         {
@@ -328,16 +344,16 @@ namespace File_Wizard.UI.Wpf
                         });
                     });
 
-                    Dispatcher.Invoke(() =>
-                    {
-                        DownloadProgressBar.Visibility = Visibility.Collapsed;
-                        CurrentFileTextBlock.Text = string.Empty;
-                    });
+                        Dispatcher.Invoke(() =>
+                        {
+                            DownloadProgressBar.Visibility = Visibility.Collapsed;
+                            CurrentFileTextBlock.Text = string.Empty;
+                        });
                 }
 
                 if (numarchivosmatch == 0)
                 {
-                    MessageBox.Show("No se encontró el archivo: " + patron);
+                    Dispatcher.Invoke(() => MessageBox.Show("No se encontró el archivo: " + patron));
                 }
                 else
                 {
@@ -346,12 +362,14 @@ namespace File_Wizard.UI.Wpf
             }
             catch
             {
-                MessageBox.Show("Error al descargar el archivo: " + patron);
+                Dispatcher.Invoke(() => MessageBox.Show("Error al descargar el archivo: " + patron));
             }
         }
 
         private void ManualDownloadButton_Click(object sender, RoutedEventArgs e)
         {
+            Dispatcher.Invoke(() => ResultTextBlock.Text = "TRACE: ManualDownloadButton_Click invoked");
+
             if (client == null || !client.IsConnected)
             {
                 MessageBox.Show("NO HAY CONEXION CON EL SERVIDOR");
@@ -388,6 +406,7 @@ namespace File_Wizard.UI.Wpf
                 ManualPathTextBox.Clear();
             }
         }
+
 
         private void DescargaManual(string rutaEntradaRemota, string rutaSalidaLocal)
         {
