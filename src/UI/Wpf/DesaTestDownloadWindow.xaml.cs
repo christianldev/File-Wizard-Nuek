@@ -86,7 +86,7 @@ namespace File_Wizard.UI.Wpf
                     ConnectionStatusText.Background = System.Windows.Media.Brushes.LimeGreen;
                     DownloadButton.IsEnabled = true;
                     ClearCacheButton.IsEnabled = true;
-                    ManualDownloadButton.IsEnabled = true;
+                    // ManualDownloadButton.IsEnabled = true;
                     SetConnectedState();
                 }
                 else
@@ -499,46 +499,46 @@ namespace File_Wizard.UI.Wpf
             }
         }
 
-        private void ManualDownloadButton_Click(object sender, RoutedEventArgs e)
-        {
-            Dispatcher.Invoke(() => ResultTextBlock.Text = "TRACE: ManualDownloadButton_Click invoked");
+        //private void ManualDownloadButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Dispatcher.Invoke(() => ResultTextBlock.Text = "TRACE: ManualDownloadButton_Click invoked");
 
-            if (client == null || !client.IsConnected)
-            {
-                MessageBox.Show("NO HAY CONEXION CON EL SERVIDOR");
-                return;
-            }
+        //    if (client == null || !client.IsConnected)
+        //    {
+        //        MessageBox.Show("NO HAY CONEXION CON EL SERVIDOR");
+        //        return;
+        //    }
 
-            if (string.IsNullOrWhiteSpace(ManualPathTextBox.Text))
-            {
-                MessageBox.Show("No se han escrito los elementos para descargar");
-                return;
-            }
+        //    // if (string.IsNullOrWhiteSpace(ManualPathTextBox.Text))
+        //    // {
+        //    //     MessageBox.Show("No se han escrito los elementos para descargar");
+        //    //     return;
+        //    // }
 
-            if (string.IsNullOrWhiteSpace(LocalDirectoryTextBox.Text))
-            {
-                MessageBox.Show("Selecciona un directorio :)");
-                return;
-            }
+        //    if (string.IsNullOrWhiteSpace(LocalDirectoryTextBox.Text))
+        //    {
+        //        MessageBox.Show("Selecciona un directorio :)");
+        //        return;
+        //    }
 
-            string rutaCompletaRemota = ManualPathTextBox.Text.Trim();
-            string rutaCompletaLocal = LocalDirectoryTextBox.Text.Trim();
+        //    //string rutaCompletaRemota = ManualPathTextBox.Text.Trim();
+        //    string rutaCompletaLocal = LocalDirectoryTextBox.Text.Trim();
 
-            if (!rutaCompletaRemota.Contains("/") || !rutaCompletaRemota.StartsWith("/") || rutaCompletaRemota.EndsWith("/")
-                || rutaCompletaRemota.Contains("*") || rutaCompletaRemota.Contains("?"))
-            {
-                MessageBox.Show("La ruta del fichero a descargar no es correcta");
-                return;
-            }
+        //    if (!rutaCompletaRemota.Contains("/") || !rutaCompletaRemota.StartsWith("/") || rutaCompletaRemota.EndsWith("/")
+        //        || rutaCompletaRemota.Contains("*") || rutaCompletaRemota.Contains("?"))
+        //    {
+        //        MessageBox.Show("La ruta del fichero a descargar no es correcta");
+        //        return;
+        //    }
 
-            DescargaManual(rutaCompletaRemota, rutaCompletaLocal);
-            if (descargaCorrecta)
-            {
-                commandHistory.Add(rutaCompletaRemota);
-                historyIndex = commandHistory.Count;
-                ManualPathTextBox.Clear();
-            }
-        }
+        //    DescargaManual(rutaCompletaRemota, rutaCompletaLocal);
+        //    if (descargaCorrecta)
+        //    {
+        //        commandHistory.Add(rutaCompletaRemota);
+        //        historyIndex = commandHistory.Count;
+        //        ManualPathTextBox.Clear();
+        //    }
+        //}
 
 
         private void DescargaManual(string rutaEntradaRemota, string rutaSalidaLocal)
@@ -587,52 +587,52 @@ namespace File_Wizard.UI.Wpf
             MessageBox.Show("Cache de directorios limpiado");
         }
 
-        private void ManualPathTextBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                ManualDownloadButton_Click(sender, new RoutedEventArgs());
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Up)
-            {
-                if (commandHistory.Count == 0)
-                {
-                    return;
-                }
+        //private void ManualPathTextBox_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    if (e.Key == Key.Enter)
+        //    {
+        //        // ManualDownloadButton_Click(sender, new RoutedEventArgs());
+        //        e.Handled = true;
+        //    }
+        //    else if (e.Key == Key.Up)
+        //    {
+        //        if (commandHistory.Count == 0)
+        //        {
+        //            return;
+        //        }
 
-                historyIndex--;
-                if (historyIndex < 0)
-                {
-                    historyIndex = 0;
-                }
+        //        historyIndex--;
+        //        if (historyIndex < 0)
+        //        {
+        //            historyIndex = 0;
+        //        }
 
-                ManualPathTextBox.Text = commandHistory[historyIndex];
-                ManualPathTextBox.CaretIndex = ManualPathTextBox.Text.Length;
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Down)
-            {
-                if (commandHistory.Count == 0)
-                {
-                    return;
-                }
+        //        //ManualPathTextBox.Text = commandHistory[historyIndex];
+        //        //ManualPathTextBox.CaretIndex = ManualPathTextBox.Text.Length;
+        //        e.Handled = true;
+        //    }
+        //    else if (e.Key == Key.Down)
+        //    {
+        //        if (commandHistory.Count == 0)
+        //        {
+        //            return;
+        //        }
 
-                historyIndex++;
-                if (historyIndex >= commandHistory.Count)
-                {
-                    historyIndex = commandHistory.Count;
-                    ManualPathTextBox.Clear();
-                }
-                else
-                {
-                    ManualPathTextBox.Text = commandHistory[historyIndex];
-                    ManualPathTextBox.CaretIndex = ManualPathTextBox.Text.Length;
-                }
+        //        historyIndex++;
+        //        if (historyIndex >= commandHistory.Count)
+        //        {
+        //            historyIndex = commandHistory.Count;
+        //            ManualPathTextBox.Clear();
+        //        }
+        //        else
+        //        {
+        //            ManualPathTextBox.Text = commandHistory[historyIndex];
+        //            ManualPathTextBox.CaretIndex = ManualPathTextBox.Text.Length;
+        //        }
 
-                e.Handled = true;
-            }
-        }
+        //        e.Handled = true;
+        //    }
+        //}
 
         private void Timer_Tick(object? sender, EventArgs e)
         {
@@ -652,7 +652,7 @@ namespace File_Wizard.UI.Wpf
         {
             DownloadButton.IsEnabled = true;
             ClearCacheButton.IsEnabled = true;
-            ManualDownloadButton.IsEnabled = true;
+          //  ManualDownloadButton.IsEnabled = true;
             BrowseButton.IsEnabled = true;
             CancelButton.IsEnabled = true;
         }
@@ -663,7 +663,7 @@ namespace File_Wizard.UI.Wpf
             ConnectionStatusText.Background = System.Windows.Media.Brushes.Tomato;
             DownloadButton.IsEnabled = false;
             ClearCacheButton.IsEnabled = false;
-            ManualDownloadButton.IsEnabled = false;
+           // ManualDownloadButton.IsEnabled = false;
             BrowseButton.IsEnabled = true;
             CancelButton.IsEnabled = true;
             ResultTextBlock.Text = string.Empty;
@@ -673,7 +673,7 @@ namespace File_Wizard.UI.Wpf
         {
             DownloadButton.IsEnabled = false;
             ClearCacheButton.IsEnabled = false;
-            ManualDownloadButton.IsEnabled = false;
+          //  ManualDownloadButton.IsEnabled = false;
             BrowseButton.IsEnabled = false;
             CancelButton.IsEnabled = false;
         }

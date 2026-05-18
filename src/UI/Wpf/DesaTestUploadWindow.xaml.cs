@@ -223,6 +223,8 @@ namespace File_Wizard.UI.Wpf
                         subidaCorrecta = false;
                         return;
                     }
+
+                    CrearRespaldoRemoto(rutaCompletaRemota);
                 }
 
                 using FileStream fs = new FileStream(rutaLocalCompleta, FileMode.Open);
@@ -247,6 +249,34 @@ namespace File_Wizard.UI.Wpf
                 subidaCorrecta = false;
                 if (mostrarMsg) MessageBox.Show("ERROR AL SUBIR EL ARCHIVO: " + archivo);
             }
+        }
+
+        private void CrearRespaldoRemoto(string rutaCompletaRemota)
+        {
+            string directorioRemoto = Path.GetDirectoryName(rutaCompletaRemota)?.Replace('\\', '/') ?? string.Empty;
+            string archivo = Path.GetFileName(rutaCompletaRemota);
+
+            string respaldoBase = $"{rutaCompletaRemota}.{DateTime.Now:yyyy.MM.dd}";
+            string respaldoFinal = respaldoBase;
+
+            if (client == null || !client.IsConnected)
+            {
+                throw new InvalidOperationException("NO HAY CONEXION CON EL SERVIDOR");
+            }
+
+            if (client.Exists(respaldoFinal))
+            {
+                respaldoFinal = $"{rutaCompletaRemota}.{DateTime.Now:yyyy.MM.dd.HH.mm.ss}";
+            }
+
+            int intento = 0;
+            while (client.Exists(respaldoFinal))
+            {
+                intento++;
+                respaldoFinal = $"{rutaCompletaRemota}.{DateTime.Now:yyyy.MM.dd.HH.mm.ss}.{intento}";
+            }
+
+            client.RenameFile(rutaCompletaRemota, respaldoFinal);
         }
 
         private void ManualPathTextBox_KeyDown(object sender, KeyEventArgs e)
