@@ -21,20 +21,19 @@ namespace File_Wizard.UI.Wpf
     {
         private readonly SftpConnectionSettings connectionSettings;
         private readonly Dictionary<string, List<ISftpFile>> cacheDirectorios = new Dictionary<string, List<ISftpFile>>();
-        private readonly List<string> commandHistory = new List<string>();
         private readonly DispatcherTimer connectionTimer = new DispatcherTimer();
 
         private SftpClient? client;
         private bool cancelarDescarga;
-        private bool descargaCorrecta;
         private string rutaLocal = @"C:";
-        private int historyIndex = -1;
         private string directorio = "/sat/cdp/desa/cpy";
 
         public DesaTestDownloadWindow(SftpConnectionSettings connectionSettings)
         {
             this.connectionSettings = connectionSettings ?? throw new ArgumentNullException(nameof(connectionSettings));
             InitializeComponent();
+
+            ConnectToEnvironment();
 
             connectionTimer.Interval = TimeSpan.FromSeconds(1);
             connectionTimer.Tick += Timer_Tick;
@@ -71,7 +70,7 @@ namespace File_Wizard.UI.Wpf
             }
         }
 
-        private void ConnectButton_Click(object sender, RoutedEventArgs e)
+        private void ConnectToEnvironment()
         {
             try
             {
@@ -82,11 +81,10 @@ namespace File_Wizard.UI.Wpf
                 if (client.IsConnected)
                 {
                     connectionTimer.Start();
-                    ConnectionStatusText.Text = "CONECTADO";
+                    ConnectionStatusText.Text = $"CONECTADO ({connectionSettings.EnvironmentName})";
                     ConnectionStatusText.Background = System.Windows.Media.Brushes.LimeGreen;
                     DownloadButton.IsEnabled = true;
                     ClearCacheButton.IsEnabled = true;
-                    // ManualDownloadButton.IsEnabled = true;
                     SetConnectedState();
                 }
                 else
@@ -104,8 +102,6 @@ namespace File_Wizard.UI.Wpf
 
         private void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
-            Dispatcher.Invoke(() => ResultTextBlock.Text = "TRACE: DownloadButton_Click invoked");
-
             if (client == null || !client.IsConnected)
             {
                 MessageBox.Show("NO HAY CONEXION CON EL SERVIDOR");
@@ -135,7 +131,7 @@ namespace File_Wizard.UI.Wpf
                 filesText = FilesTextBox.Text;
                 localDirectory = LocalDirectoryTextBox.Text;
                 prefixChecked = PrefixCheckBox.IsChecked == true;
-                desaChecked = DesaRadioButton.IsChecked == true;
+                
             });
 
             cancelarDescarga = false;
@@ -541,41 +537,6 @@ namespace File_Wizard.UI.Wpf
         //}
 
 
-        private void DescargaManual(string rutaEntradaRemota, string rutaSalidaLocal)
-        {
-            descargaCorrecta = false;
-            string archivo = Path.GetFileName(rutaEntradaRemota);
-            string localFilePath = Path.Combine(rutaSalidaLocal, archivo);
-
-            try
-            {
-                if (!client!.Exists(rutaEntradaRemota))
-                {
-                    MessageBox.Show("No existe el archivo: " + archivo);
-                    return;
-                }
-
-                var attrs = client.GetAttributes(rutaEntradaRemota);
-                if (attrs.IsDirectory)
-                {
-                    MessageBox.Show("Error - El texto ingresado es un directorio: " + rutaEntradaRemota);
-                    return;
-                }
-
-                using (Stream filestream = File.Create(localFilePath))
-                {
-                    client.DownloadFile(rutaEntradaRemota, filestream);
-                }
-
-                descargaCorrecta = true;
-                MessageBox.Show("Archivo descargado correctmente");
-            }
-            catch
-            {
-                MessageBox.Show("Error al descarrgar el archivo: " + archivo);
-            }
-        }
-
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             cancelarDescarga = true;
@@ -652,7 +613,6 @@ namespace File_Wizard.UI.Wpf
         {
             DownloadButton.IsEnabled = true;
             ClearCacheButton.IsEnabled = true;
-          //  ManualDownloadButton.IsEnabled = true;
             BrowseButton.IsEnabled = true;
             CancelButton.IsEnabled = true;
         }
@@ -663,7 +623,6 @@ namespace File_Wizard.UI.Wpf
             ConnectionStatusText.Background = System.Windows.Media.Brushes.Tomato;
             DownloadButton.IsEnabled = false;
             ClearCacheButton.IsEnabled = false;
-           // ManualDownloadButton.IsEnabled = false;
             BrowseButton.IsEnabled = true;
             CancelButton.IsEnabled = true;
             ResultTextBlock.Text = string.Empty;
@@ -673,7 +632,6 @@ namespace File_Wizard.UI.Wpf
         {
             DownloadButton.IsEnabled = false;
             ClearCacheButton.IsEnabled = false;
-          //  ManualDownloadButton.IsEnabled = false;
             BrowseButton.IsEnabled = false;
             CancelButton.IsEnabled = false;
         }

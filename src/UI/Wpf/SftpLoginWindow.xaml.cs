@@ -12,9 +12,24 @@ namespace File_Wizard.UI.Wpf
     {
         public SftpConnectionSettings? ConnectionSettings { get; private set; }
 
+        private const string DesaTestHost = "10.22.98.131";
+        private const string QaHost = "172.21.200.16";
+
         public SftpLoginWindow()
         {
             InitializeComponent();
+            UpdateHostByEnvironment();
+        }
+
+        private void EnvironmentComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            UpdateHostByEnvironment();
+        }
+
+        private void UpdateHostByEnvironment()
+        {
+            string environmentName = ((System.Windows.Controls.ComboBoxItem)EnvironmentComboBox.SelectedItem)?.Content?.ToString() ?? "DESA";
+            HostTextBox.Text = environmentName == "QA" ? QaHost : DesaTestHost;
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
@@ -45,11 +60,16 @@ namespace File_Wizard.UI.Wpf
 
                 client.Disconnect();
 
+                string environmentName = ((System.Windows.Controls.ComboBoxItem)EnvironmentComboBox.SelectedItem)?.Content?.ToString() ?? "DESA";
+
+                UpdateHostByEnvironment();
+
                 ConnectionSettings = new SftpConnectionSettings(
                     HostTextBox.Text.Trim(),
                     port,
                     UsernameTextBox.Text.Trim(),
-                    PasswordBox.Password);
+                    PasswordBox.Password,
+                    environmentName);
 
                 DialogResult = true;
             }

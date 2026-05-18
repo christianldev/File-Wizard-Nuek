@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Login SFTP"
         Width="420"
-        Height="286"
+        Height="320"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="#FFF5F8FC"
@@ -38,16 +38,19 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="30" />
                 <RowDefinition Height="30" />
+                <RowDefinition Height="34" />
             </Grid.RowDefinitions>
 
             <TextBlock Text="Host" VerticalAlignment="Center" />
             <TextBlock Grid.Row="1" Text="Puerto" VerticalAlignment="Center" />
             <TextBlock Grid.Row="2" Text="Usuario" VerticalAlignment="Center" />
             <TextBlock Grid.Row="3" Text="Contraseña" VerticalAlignment="Center" />
+            <TextBlock Grid.Row="4" Text="Entorno" VerticalAlignment="Center" />
 
             <TextBox x:Name="HostTextBox"
                      Grid.Column="1"
                      Text="10.22.98.131"
+                     IsReadOnly="True"
                      VerticalContentAlignment="Center" />
             <TextBox x:Name="PortTextBox"
                      Grid.Row="1"
@@ -63,6 +66,15 @@
                          Grid.Row="3"
                          Grid.Column="1"
                          Password="I584039" />
+            <ComboBox x:Name="EnvironmentComboBox"
+                      Grid.Row="4"
+                      Grid.Column="1"
+                      SelectedIndex="0"
+                      SelectionChanged="EnvironmentComboBox_SelectionChanged">
+                <ComboBoxItem Content="DESA" />
+                <ComboBoxItem Content="TEST" />
+                <ComboBoxItem Content="QA" />
+            </ComboBox>
         </Grid>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">

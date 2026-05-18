@@ -36,12 +36,12 @@
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Directorio LOCAL:" FontSize="14" FontWeight="SemiBold" Foreground="#131C2E" VerticalAlignment="Center" />
         <Button Grid.Row="0" Grid.Column="2" x:Name="BrowseButton" Width="96" Height="28" Content="..." Click="BrowseButton_Click" Background="#E1E5ED" />
         <TextBox Grid.Row="0" Grid.Column="4" x:Name="LocalDirectoryTextBox" Height="66" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="White" BorderBrush="#D1D5DB" />
-        <Button Grid.Row="2" Margin="3,20,10,52" x:Name="ConnectButton" Width="117" Height="28" Content="CONECTAR" Click="ConnectButton_Click" Background="#1F6FEB" Foreground="White" Cursor="Hand" Grid.Column="2" />
+        <TextBlock Grid.Row="2" Margin="3,20,10,52" Width="117" Height="28" Text="Sesión iniciada" Background="#1F6FEB" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" Grid.Column="2" Padding="0,4,0,0" />
         <Border Grid.Row="1" Grid.Column="4" Margin="0,16,0,0" Height="24" Width="120" Background="#FF6B6B" CornerRadius="4" HorizontalAlignment="Left" VerticalAlignment="Center">
             <TextBlock x:Name="ConnectionStatusText" Text="DESCONECTADO" Foreground="White" TextAlignment="Center" FontWeight="SemiBold" VerticalAlignment="Center" FontSize="11" />
         </Border>
 
-        <TextBlock Grid.Row="2" Margin="10,17,98,58" Text="Ambiente:" FontSize="14" FontWeight="SemiBold" Foreground="#131C2E" />
+        <TextBlock Grid.Row="2" Margin="10,17,98,58" Text="Entorno:" FontSize="14" FontWeight="SemiBold" Foreground="#131C2E" />
         <StackPanel Grid.Row="2" Grid.Column="4" Margin="0,20,0,0" Orientation="Vertical">
             <RadioButton x:Name="Environment1RadioButton" Content="SATQANEXC (CERTIF)" IsChecked="True" Foreground="#374151" Margin="0,0,0,6" />
             <RadioButton x:Name="Environment2RadioButton" Content="SATQANEXUS (COMUNI)" Foreground="#374151" Margin="0,0,0,6" />
@@ -65,12 +65,9 @@
         <TextBlock Grid.Row="4" Grid.Column="4" x:Name="CurrentItemTextBlock" Margin="0,52,0,0" Foreground="#131C2E" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Top" TextWrapping="Wrap" />
         <TextBlock Grid.Row="4" Grid.Column="4" x:Name="ResultTextBlock" Margin="0,82,0,0" Foreground="#10B981" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Top" TextWrapping="Wrap" />
 
-        <TextBlock Grid.Row="5" Grid.Column="0" Margin="0,20,0,0" Text="Descarga manual:" FontSize="14" FontWeight="SemiBold" Foreground="#131C2E" />
-        <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,40,0,0" Text="(escribir ruta remota completa del archivo)" FontSize="11" Foreground="#606C81" />
+        <TextBlock Grid.Row="5" Grid.Column="0" Margin="0,20,0,0" Text="Descarga manual eliminada" FontSize="14" FontWeight="SemiBold" Foreground="#131C2E" />
+        <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,40,0,0" Text="(ahora solo se usa descarga por listado)" FontSize="11" Foreground="#606C81" />
 
-        <TextBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" x:Name="ManualPathTextBox" Margin="0,8,0,0" Height="28" Text="/satqanexc/dat/MPJ01010.FLOG0064" KeyDown="ManualPathTextBox_KeyDown" Foreground="#2563EB" VerticalContentAlignment="Center" Padding="4,0" BorderBrush="#D1D5DB" />
-        <Button Grid.Row="6" Grid.Column="4" x:Name="ManualDownloadButton" Margin="0,8,0,0" Width="140" Height="28" Content="DESCARGA MANUAL" Click="ManualDownloadButton_Click" Background="#6B7280" Foreground="White" Cursor="Hand" HorizontalAlignment="Left" />
-
-        <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Margin="0,40,0,0" x:Name="StatusDetailsTextBlock" Foreground="#131C2E" FontSize="11" />
+        <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Margin="0,8,0,0" x:Name="StatusDetailsTextBlock" Foreground="#131C2E" FontSize="11" />
     </Grid>
 </Window>

@@ -38,7 +38,7 @@
         <TextBox Grid.Row="0" Grid.Column="4" x:Name="LocalDirectoryTextBox" Height="66" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="White" BorderBrush="#D1D5DB" />
 
         <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,16,0,0" Text="Archivos remotos:" FontSize="14" FontWeight="SemiBold" Foreground="#131C2E" VerticalAlignment="Center" />
-        <Button Grid.Row="1" Grid.Column="2" Margin="0,16,0,0" x:Name="ConnectButton" Width="117" Height="28" Content="CONECTAR" Click="ConnectButton_Click" Background="#1F6FEB" Foreground="White" Cursor="Hand" />
+        <TextBlock Grid.Row="1" Grid.Column="2" Margin="0,16,0,0" Width="117" Height="28" Text="Sesión iniciada" Background="#1F6FEB" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" Padding="0,4,0,0" />
         
         <!-- En WPF nativo puede ser exigente con CornerRadius, usamos una forma alternativa -->
         <Border Grid.Row="1" Grid.Column="4" Margin="0,16,0,0" Height="24" Width="120" Background="#FF6B6B" HorizontalAlignment="Left" VerticalAlignment="Center">
@@ -56,7 +56,7 @@
         <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,24,0,0" Text="Subida manual" FontSize="14" FontWeight="SemiBold" Foreground="#131C2E" />
         <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Text="(escribir ruta completa y nombre del archivo)" FontSize="11" Foreground="#606C81" />
         
-        <TextBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" x:Name="ManualPathTextBox" Margin="0,10,0,0" Height="28" Text="/sat/cdp/desa/dat/MPJ01010.FLOG0064" KeyDown="ManualPathTextBox_KeyDown" Foreground="#2563EB" VerticalContentAlignment="Center" Padding="4,0" BorderBrush="#D1D5DB" />
+        <TextBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" x:Name="ManualPathTextBox" Margin="0,10,0,0" Height="28" Text="/sat/cdp/desa/dat/MPJ01010.FLOG0064" Foreground="#2563EB" VerticalContentAlignment="Center" Padding="4,0" BorderBrush="#D1D5DB" />
         <Button Grid.Row="5" Grid.Column="4" x:Name="UploadButton" Margin="0,10,0,0" Width="120" Height="28" HorizontalAlignment="Left" Content="UPLOAD MANUAL" Click="UploadFileButton_Click" Background="#6B7280" Foreground="White" />
     </Grid>
 </Window>

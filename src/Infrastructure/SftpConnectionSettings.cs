@@ -10,12 +10,15 @@ namespace File_Wizard.Infrastructure
 
         public string Password { get; }
 
-        public SftpConnectionSettings(string host, int port, string username, string password)
+        public string EnvironmentName { get; }
+
+        public SftpConnectionSettings(string host, int port, string username, string password, string environmentName)
         {
             Host = host;
             Port = port;
             Username = username;
             Password = password;
+            EnvironmentName = environmentName;
         }
     }
 }

@@ -16,19 +16,19 @@ namespace File_Wizard.UI.Wpf
     public partial class DesaTestUploadWindow : Window
     {
         private readonly SftpConnectionSettings connectionSettings;
-        private readonly List<string> commandHistory = new List<string>();
         private readonly DispatcherTimer connectionTimer = new DispatcherTimer();
 
         private SftpClient? client;
         private bool subidaCorrecta;
         private string rutaLocal = @"C:";
-        private int historyIndex = -1;
         private string directorio = "/sat/cdp/desa/cpy";
 
         public DesaTestUploadWindow(SftpConnectionSettings connectionSettings)
         {
             this.connectionSettings = connectionSettings ?? throw new ArgumentNullException(nameof(connectionSettings));
             InitializeComponent();
+
+            ConnectToEnvironment();
 
             connectionTimer.Interval = TimeSpan.FromSeconds(5);
             connectionTimer.Tick += Timer_Tick;
@@ -79,7 +79,7 @@ namespace File_Wizard.UI.Wpf
             }
         }
 
-        private void ConnectButton_Click(object sender, RoutedEventArgs e)
+        private void ConnectToEnvironment()
         {
             try
             {
@@ -90,7 +90,7 @@ namespace File_Wizard.UI.Wpf
                 if (client.IsConnected)
                 {
                     connectionTimer.Start();
-                    ConnectionStatusText.Text = "CONECTADO";
+                    ConnectionStatusText.Text = $"CONECTADO ({connectionSettings.EnvironmentName})";
                     ConnectionStatusText.Background = System.Windows.Media.Brushes.LimeGreen;
                     UploadFileButton.IsEnabled = true;
                     UploadButton.IsEnabled = true;
@@ -279,95 +279,6 @@ namespace File_Wizard.UI.Wpf
             client.RenameFile(rutaCompletaRemota, respaldoFinal);
         }
 
-        private void ManualPathTextBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                if (client == null || !client.IsConnected)
-                {
-                    MessageBox.Show("NO HAY CONEXION CON EL SERVIDOR");
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(ManualPathTextBox.Text))
-                {
-                    MessageBox.Show("No se han escrito los elementos para subir");
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(LocalDirectoryTextBox.Text))
-                {
-                    MessageBox.Show("Selecciona un directorio :)");
-                    return;
-                }
-
-                string rutaCompletaRemota = ManualPathTextBox.Text.Trim();
-                if (rutaCompletaRemota.Contains("/") && rutaCompletaRemota.StartsWith("/") && !rutaCompletaRemota.EndsWith("/")
-                    && !rutaCompletaRemota.Contains("*") && !rutaCompletaRemota.Contains("?"))
-                {
-                    string archivo = Path.GetFileName(ManualPathTextBox.Text.Trim());
-                    string rutaCompletaLocal = Path.Combine(LocalDirectoryTextBox.Text.Trim(), archivo);
-                    if (!File.Exists(rutaCompletaLocal))
-                    {
-                        MessageBox.Show("El archivo que se desea subir no existe en el directorio local :(");
-                        return;
-                    }
-
-                    SubirArchivo(rutaCompletaLocal, mostrarMsg: true);
-                    if (subidaCorrecta)
-                    {
-                        commandHistory.Add(rutaCompletaRemota);
-                        historyIndex = commandHistory.Count;
-                        ManualPathTextBox.Clear();
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("La ruta del fichero a subir no es correcta");
-                }
-
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Up)
-            {
-                if (commandHistory.Count == 0)
-                {
-                    return;
-                }
-
-                historyIndex--;
-                if (historyIndex < 0)
-                {
-                    historyIndex = 0;
-                }
-
-                ManualPathTextBox.Text = commandHistory[historyIndex];
-                ManualPathTextBox.CaretIndex = ManualPathTextBox.Text.Length;
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Down)
-            {
-                if (commandHistory.Count == 0)
-                {
-                    return;
-                }
-
-                historyIndex++;
-                if (historyIndex >= commandHistory.Count)
-                {
-                    historyIndex = commandHistory.Count;
-                    ManualPathTextBox.Clear();
-                }
-                else
-                {
-                    ManualPathTextBox.Text = commandHistory[historyIndex];
-                    ManualPathTextBox.CaretIndex = ManualPathTextBox.Text.Length;
-                }
-
-                e.Handled = true;
-            }
-        }
-
         private void Timer_Tick(object? sender, EventArgs e)
         {
             if (client == null || !client.IsConnected)
@@ -382,7 +293,6 @@ namespace File_Wizard.UI.Wpf
 
         private void SetConnectedState()
         {
-            ConnectButton.IsEnabled = false;
             UploadFileButton.IsEnabled = true;
             UploadButton.IsEnabled = true;
             BrowseButton.IsEnabled = true;
@@ -392,7 +302,6 @@ namespace File_Wizard.UI.Wpf
         {
             ConnectionStatusText.Text = "DESCONECTADO";
             ConnectionStatusText.Background = System.Windows.Media.Brushes.Tomato;
-            ConnectButton.IsEnabled = true;
             UploadFileButton.IsEnabled = false;
             UploadButton.IsEnabled = false;
             BrowseButton.IsEnabled = true;

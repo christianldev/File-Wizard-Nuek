@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="DESA-TEST Downloader"
         Width="1168"
-        Height="950"
+        Height="940"
         WindowStartupLocation="CenterScreen"
         Background="#FFF5F7FC"
         FontFamily="Segoe UI"
@@ -17,13 +17,13 @@
         <Border Background="#0F172A" Grid.Row="0">
             <Grid Margin="35,22,35,22">
                 <TextBlock Text="DESA-TEST Downloader"
-                           FontSize="23.25"
+                           FontSize="24"
                            FontWeight="SemiBold"
                            Foreground="White"
                            VerticalAlignment="Top" />
                 <TextBlock Text="Busca, descarga y administra componentes del entorno DESA-TEST"
                            Margin="0,56,0,0"
-                           FontSize="10"
+                           FontSize="14"
                            Foreground="#BFCDE4"
                            VerticalAlignment="Top" />
                 <Border HorizontalAlignment="Right"
@@ -58,13 +58,16 @@
                                    FontWeight="Bold"
                                    Foreground="#334155" />
                         <StackPanel Orientation="Horizontal" Margin="0,12,0,12">
-                            <Button x:Name="ConnectButton"
-                                    Width="135"
-                                    Height="34"
-                                    Margin="0,0,12,0"
-                                    Content="Conectar"
-                                    Click="ConnectButton_Click" />
-                            
+                            <TextBlock Width="135"
+                                       Height="34"
+                                       Margin="0,0,12,0"
+                                       Background="#1F6FEB"
+                                       Foreground="White"
+                                       FontWeight="SemiBold"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Padding="0,7,0,0"
+                                       Text="Sesión iniciada" />
                             <Button x:Name="ClearCacheButton"
                                     Width="160"
                                     Height="34"
@@ -88,16 +91,14 @@
                 <Border Grid.Row="2" Background="White" Padding="21" CornerRadius="4">
                     <StackPanel>
                         <TextBlock Text="Descarga por listado"
-                                   FontSize="11"
+                                   FontSize="18"
                                    FontWeight="Bold"
+                                   Margin="0,0,0,10"
                                    Foreground="#0F172A" />
-                        <TextBlock Text="Escribe una línea por archivo o patrón (* o ?)."
-                                   Margin="0,6,0,12"
-                                   Foreground="#64748B" />
+   
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Ambiente:" VerticalAlignment="Center" Margin="0,0,12,0" />
-                            <RadioButton x:Name="DesaRadioButton" Content="DESA" IsChecked="True" Margin="0,0,12,0" />
-                            <RadioButton x:Name="TestRadioButton" Content="TEST" Margin="0,0,12,0" />
+                            <TextBlock Text="Bajar componente con un prefijo:" VerticalAlignment="Center" Margin="0,0,12,0" FontSize="14" />
+                            
                             <CheckBox x:Name="PrefixCheckBox" Content="PREFIJO?" IsChecked="True" VerticalAlignment="Center" />
                         </StackPanel>
                         <Grid Margin="0,16,0,0">
@@ -131,28 +132,11 @@
                                          VerticalScrollBarVisibility="Auto"
                                          TextWrapping="Wrap" />
 
-                                <!--  <TextBlock Text="Descarga manual" FontWeight="SemiBold" />  -->
-                               <!-- <TextBlock Text="(escribir ruta completa y nombre del archivo)"
-                                           Margin="0,4,0,8"
-                                           Foreground="#64748B" /> -->
-                               <!-- <DockPanel>
-                                    <Button x:Name="ManualDownloadButton"
-                                            Width="120"
-                                            Height="30"
-                                            Content="Descargar"
-                                            DockPanel.Dock="Right"
-                                            Margin="8,0,0,0"
-                                            Click="ManualDownloadButton_Click" />
-                                    <TextBox x:Name="ManualPathTextBox"
-                                             Height="30"
-                                             Text="/sat/cdp/desa/dat/MPJ01010.FLOG0064"
-                                             KeyDown="ManualPathTextBox_KeyDown"
-                                             VerticalContentAlignment="Center" />
-                                </DockPanel> -->
+                                
                             </StackPanel>
 
                             <StackPanel Grid.Column="2">
-                                <TextBlock Text="Progreso" FontWeight="SemiBold" />
+                                <TextBlock Text="Progreso" FontWeight="SemiBold" FontSize="16"/>
                                 <ProgressBar x:Name="DownloadProgressBar"
                                              Height="20"
                                              Margin="0,8,0,8"
@@ -166,12 +150,13 @@
                                         Height="34"
                                         Margin="0,0,0,8"
                                         Content="Descargar listado"
-                                        
+                                        Background="#10B981"
                                         Click="DownloadButton_Click" />
                                 <Button x:Name="CancelButton"
                                         Height="34"
                                         Margin="0,0,0,8"
                                         Content="Cancelar"
+                                        Background="#EF4444"
                                         Click="CancelButton_Click" />
                             </StackPanel>
                         </Grid>
