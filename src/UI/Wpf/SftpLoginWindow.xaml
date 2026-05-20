@@ -49,28 +49,24 @@
 
             <TextBox x:Name="HostTextBox"
                      Grid.Column="1"
-                     Text="10.22.98.131"
-                     IsReadOnly="True"
                      VerticalContentAlignment="Center" />
             <TextBox x:Name="PortTextBox"
                      Grid.Row="1"
                      Grid.Column="1"
-                     Text="22"
                      VerticalContentAlignment="Center" />
             <TextBox x:Name="UsernameTextBox"
                      Grid.Row="2"
                      Grid.Column="1"
-                     Text="i584039"
                      VerticalContentAlignment="Center" />
             <PasswordBox x:Name="PasswordBox"
                          Grid.Row="3"
                          Grid.Column="1"
-                         Password="I584039" />
+                     />
             <ComboBox x:Name="EnvironmentComboBox"
                       Grid.Row="4"
                       Grid.Column="1"
-                      SelectedIndex="0"
-                      SelectionChanged="EnvironmentComboBox_SelectionChanged">
+                                            SelectedIndex="0"
+                                            SelectionChanged="EnvironmentComboBox_SelectionChanged">
                 <ComboBoxItem Content="DESA" />
                 <ComboBoxItem Content="TEST" />
                 <ComboBoxItem Content="QA" />

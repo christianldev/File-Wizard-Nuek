@@ -41,3 +41,4 @@ Desktop.ini
 # Generated files
 *.cache
 *.lastcodeanalysissucceeded
+.env

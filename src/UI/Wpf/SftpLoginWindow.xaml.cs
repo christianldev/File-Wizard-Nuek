@@ -12,24 +12,25 @@ namespace File_Wizard.UI.Wpf
     {
         public SftpConnectionSettings? ConnectionSettings { get; private set; }
 
-        private const string DesaTestHost = "10.22.98.131";
-        private const string QaHost = "172.21.200.16";
+        private const string DefaultEnvironmentName = "DESA";
 
         public SftpLoginWindow()
         {
             InitializeComponent();
-            UpdateHostByEnvironment();
+            UpdateHostAndPortByEnvironment();
         }
 
         private void EnvironmentComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            UpdateHostByEnvironment();
+            UpdateHostAndPortByEnvironment();
         }
 
-        private void UpdateHostByEnvironment()
+        private void UpdateHostAndPortByEnvironment()
         {
-            string environmentName = ((System.Windows.Controls.ComboBoxItem)EnvironmentComboBox.SelectedItem)?.Content?.ToString() ?? "DESA";
-            HostTextBox.Text = environmentName == "QA" ? QaHost : DesaTestHost;
+            string environmentName = GetSelectedEnvironmentName();
+
+            HostTextBox.Text = GetEnvironmentSetting(environmentName, "HOST");
+            PortTextBox.Text = GetEnvironmentSetting(environmentName, "PORT");
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
@@ -60,9 +61,7 @@ namespace File_Wizard.UI.Wpf
 
                 client.Disconnect();
 
-                string environmentName = ((System.Windows.Controls.ComboBoxItem)EnvironmentComboBox.SelectedItem)?.Content?.ToString() ?? "DESA";
-
-                UpdateHostByEnvironment();
+                string environmentName = GetSelectedEnvironmentName();
 
                 ConnectionSettings = new SftpConnectionSettings(
                     HostTextBox.Text.Trim(),
@@ -77,6 +76,18 @@ namespace File_Wizard.UI.Wpf
             {
                 MessageBox.Show($"Error al validar las credenciales SFTP: {ex.Message}");
             }
+        }
+
+        private string GetSelectedEnvironmentName()
+        {
+            string environmentName = ((System.Windows.Controls.ComboBoxItem)EnvironmentComboBox.SelectedItem)?.Content?.ToString() ?? DefaultEnvironmentName;
+
+            return environmentName.Trim().ToUpperInvariant();
+        }
+
+        private static string GetEnvironmentSetting(string environmentName, string settingName)
+        {
+            return DotEnv.GetString($"SFTP_{environmentName}_{settingName}", string.Empty);
         }
     }
 }
