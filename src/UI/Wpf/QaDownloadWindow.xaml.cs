@@ -99,6 +99,12 @@ namespace File_Wizard.UI.Wpf
 
         private void DownloadListButton_Click(object sender, RoutedEventArgs e)
         {
+            if (client == null || !client.IsConnected)
+            {
+                MessageBox.Show("NO HAY CONEXION CON EL SERVIDOR");
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(FilesTextBox.Text))
             {
                 MessageBox.Show("No se han escrito los elementos para descargar");
@@ -127,10 +133,6 @@ namespace File_Wizard.UI.Wpf
             bool environment3 = Environment3RadioButton.IsChecked == true;
             bool environment4 = OtherEnvironmentRadioButton.IsChecked == true;
             bool usePrefix = true;
-            if (usePrefix)
-            {
-                usePrefix = true;
-            }
             string otherEnvironmentValue = OtherEnvironmentTextBox.Text.Trim();
 
             Thread downloadThread = new Thread(() =>
@@ -187,7 +189,7 @@ namespace File_Wizard.UI.Wpf
                         default: hubodirectorio = false; break;
                     }
                 }
-                if (environment2)
+                else if (environment2)
                 {
                     prefijoPredict = "QA-COMUNIT-";
                     switch (extension)
@@ -202,7 +204,7 @@ namespace File_Wizard.UI.Wpf
                         default: hubodirectorio = false; break;
                     }
                 }
-                if (environment3)
+                else if (environment3)
                 {
                     prefijoPredict = "QA-BCHILE-";
                     switch (extension)
@@ -217,7 +219,7 @@ namespace File_Wizard.UI.Wpf
                         default: hubodirectorio = false; break;
                     }
                 }
-                if (environment4)
+                else if (environment4)
                 {
                     prefijoPredict = "QAX-";
                     switch (extension)
@@ -430,6 +432,8 @@ namespace File_Wizard.UI.Wpf
         {
             DownloadListButton.IsEnabled = true;
             ClearCacheButton.IsEnabled = true;
+            BrowseButton.IsEnabled = true;
+            CancelButton.IsEnabled = true;
         }
 
         private void SetDisconnectedState()
@@ -438,6 +442,8 @@ namespace File_Wizard.UI.Wpf
             ConnectionStatusText.Background = System.Windows.Media.Brushes.Tomato;
             DownloadListButton.IsEnabled = false;
             ClearCacheButton.IsEnabled = false;
+            BrowseButton.IsEnabled = true;
+            CancelButton.IsEnabled = true;
         }
 
         private void SetBusyState()
@@ -457,8 +463,6 @@ namespace File_Wizard.UI.Wpf
             }
 
             SetConnectedState();
-            BrowseButton.IsEnabled = true;
-            CancelButton.IsEnabled = true;
         }
     }
 }

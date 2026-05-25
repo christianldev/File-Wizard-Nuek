@@ -36,7 +36,9 @@
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Directorio LOCAL:" FontSize="14" FontWeight="SemiBold" Foreground="#131C2E" VerticalAlignment="Center" />
         <Button Grid.Row="0" Grid.Column="2" x:Name="BrowseButton" Width="96" Height="28" Content="..." Click="BrowseButton_Click" Background="#E1E5ED" />
         <TextBox Grid.Row="0" Grid.Column="4" x:Name="LocalDirectoryTextBox" Height="66" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="White" BorderBrush="#D1D5DB" />
-        <TextBlock Grid.Row="2" Margin="3,20,10,52" Width="117" Height="28" Text="Sesión iniciada" Background="#1F6FEB" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" Grid.Column="2" Padding="0,4,0,0" />
+        <Border Grid.Row="2" Grid.Column="2" Margin="3,20,10,52" Width="117" Height="28" Background="#1F6FEB" VerticalAlignment="Center">
+            <TextBlock Text="Sesión iniciada" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" />
+        </Border>
         <Border Grid.Row="1" Grid.Column="4" Margin="0,16,0,0" Height="24" Width="120" Background="#FF6B6B" CornerRadius="4" HorizontalAlignment="Left" VerticalAlignment="Center">
             <TextBlock x:Name="ConnectionStatusText" Text="DESCONECTADO" Foreground="White" TextAlignment="Center" FontWeight="SemiBold" VerticalAlignment="Center" FontSize="11" />
         </Border>
