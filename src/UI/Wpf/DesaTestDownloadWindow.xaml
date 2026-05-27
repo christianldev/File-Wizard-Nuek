@@ -29,14 +29,12 @@
                 <Border HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         Width="181"
-                        Height="49"
+                        Height="80"
                         Background="#1E293B"
                         CornerRadius="2">
-                    <TextBlock Text="DESA-TEST"
-                               Foreground="#93C5FD"
-                               FontWeight="Bold"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center" />
+                    <Image Source="pack://application:,,,/src/assets/NUEK-LOGO-BLANCO.png"
+                           Stretch="Uniform"
+                           Margin="10,8" />
                 </Border>
             </Grid>
         </Border>

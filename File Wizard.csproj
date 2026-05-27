@@ -39,4 +39,8 @@
   <ItemGroup>
     <None Include=".github\copilot-instructions.md" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="src\assets\NUEK-LOGO-BLANCO.png" />
+  </ItemGroup>
 </Project>

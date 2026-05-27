@@ -2,11 +2,12 @@ using File_Wizard.Infrastructure;
 using Renci.SshNet;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.Versioning;
+using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Threading;
 using Ookii.Dialogs.Wpf;
 
@@ -17,9 +18,10 @@ namespace File_Wizard.UI.Wpf
     {
         private readonly SftpConnectionSettings connectionSettings;
         private readonly DispatcherTimer connectionTimer = new DispatcherTimer();
+        private readonly ObservableCollection<UploadDestinationDecision> destinationDecisions = new ObservableCollection<UploadDestinationDecision>();
+        private readonly Dictionary<string, string> destinationChoiceCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         private SftpClient? client;
-        private bool subidaCorrecta;
         private string rutaLocal = @"C:";
         private string directorio = "/sat/cdp/desa/cpy";
 
@@ -27,6 +29,12 @@ namespace File_Wizard.UI.Wpf
         {
             this.connectionSettings = connectionSettings ?? throw new ArgumentNullException(nameof(connectionSettings));
             InitializeComponent();
+
+            DestinationDecisionsGrid.ItemsSource = destinationDecisions;
+            DesaRadioButton.Checked += DestinationContext_Changed;
+            TestRadioButton.Checked += DestinationContext_Changed;
+            DatSecRoutingCheckBox.Checked += DestinationContext_Changed;
+            DatSecRoutingCheckBox.Unchecked += DestinationContext_Changed;
 
             ConnectToEnvironment();
 
@@ -70,13 +78,20 @@ namespace File_Wizard.UI.Wpf
 
                 if (archivosSeleccionadosParaSubir.Length == 1)
                 {
-                    ManualPathTextBox.Text = Path.GetFileName(openDialog.FileName);
+                    SelectedFilesTextBox.Text = Path.GetFileName(openDialog.FileName);
                 }
                 else
                 {
-                    ManualPathTextBox.Text = $"<{archivosSeleccionadosParaSubir.Length} archivos seleccionados>";
+                    SelectedFilesTextBox.Text = string.Join(Environment.NewLine, archivosSeleccionadosParaSubir);
                 }
+
+                RefreshDestinationDecisions();
             }
+        }
+
+        private void DestinationContext_Changed(object sender, RoutedEventArgs e)
+        {
+            RefreshDestinationDecisions();
         }
 
         private void ConnectToEnvironment()
@@ -93,7 +108,7 @@ namespace File_Wizard.UI.Wpf
                     ConnectionStatusText.Text = $"CONECTADO ({connectionSettings.EnvironmentName})";
                     ConnectionStatusText.Background = System.Windows.Media.Brushes.LimeGreen;
                     UploadFileButton.IsEnabled = true;
-                    UploadButton.IsEnabled = true;
+                    ClearCacheButton.IsEnabled = true;
                     SetConnectedState();
                 }
                 else
@@ -107,6 +122,15 @@ namespace File_Wizard.UI.Wpf
                 MessageBox.Show("Error en la conexion");
                 SetDisconnectedState();
             }
+        }
+
+        private void ClearCacheButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveCurrentDecisionsToCache();
+            archivosSeleccionadosParaSubir = null;
+            SelectedFilesTextBox.Text = "Aún no hay archivos seleccionados";
+            destinationDecisions.Clear();
+            destinationChoiceCache.Clear();
         }
 
         private void UploadFileButton_Click(object sender, RoutedEventArgs e)
@@ -129,88 +153,89 @@ namespace File_Wizard.UI.Wpf
                 return;
             }
 
-            // Subida múltiple (por Botón Browse)
-            if (archivosSeleccionadosParaSubir != null && archivosSeleccionadosParaSubir.Length > 0 && 
-                ManualPathTextBox.Text.StartsWith("<") && ManualPathTextBox.Text.EndsWith("archivos seleccionados>"))
+            if (archivosSeleccionadosParaSubir == null || archivosSeleccionadosParaSubir.Length == 0)
             {
-                int correctos = 0;
-                foreach (string ruta in archivosSeleccionadosParaSubir)
+                MessageBox.Show("Selecciona uno o más archivos para subir.");
+                return;
+            }
+
+            SaveCurrentDecisionsToCache();
+            RefreshDestinationDecisions();
+
+            int correctos = 0;
+            var fallidos = new List<string>();
+            var noEncontrados = new List<string>();
+            var erroresDetalle = new List<string>();
+
+            foreach (string ruta in archivosSeleccionadosParaSubir)
+            {
+                if (!File.Exists(ruta))
                 {
-                    if (File.Exists(ruta))
+                    noEncontrados.Add(Path.GetFileName(ruta));
+                    continue;
+                }
+
+                string? error;
+                if (SubirArchivo(ruta, mostrarMsg: false, out error))
+                {
+                    correctos++;
+                }
+                else
+                {
+                    fallidos.Add(Path.GetFileName(ruta));
+                    if (!string.IsNullOrWhiteSpace(error))
                     {
-                        SubirArchivo(ruta, mostrarMsg: false);
-                        if (subidaCorrecta) correctos++;
+                        erroresDetalle.Add(error);
                     }
                 }
-                MessageBox.Show($"Proceso finalizado. Subidos correctamente: {correctos} de {archivosSeleccionadosParaSubir.Length}.");
-                return;
             }
 
-            // Subida individual o manual
-            if (string.IsNullOrWhiteSpace(ManualPathTextBox.Text))
+            if (correctos == archivosSeleccionadosParaSubir.Length)
             {
-                MessageBox.Show("No se han escrito los elementos para descargar");
-                return;
-            }
-
-            string archivo = ManualPathTextBox.Text.Trim();
-            if (archivo.Contains("/") || archivo.Contains("?"))
-            {
-                MessageBox.Show("El nombre del archivo a subir tiene caracteres no permitidos: * ?");
-                return;
-            }
-
-            string rutaCompleta = Path.Combine(LocalDirectoryTextBox.Text.Trim(), archivo);
-            if (File.Exists(rutaCompleta))
-            {
-                SubirArchivo(rutaCompleta, mostrarMsg: true);
+                MessageBox.Show(archivosSeleccionadosParaSubir.Length == 1
+                    ? "Archivo subido correctamente."
+                    : $"Proceso finalizado. Subidos correctamente: {correctos} de {archivosSeleccionadosParaSubir.Length}.");
             }
             else
             {
-                MessageBox.Show("El archivo local ingresado no existe :(");
+                string detalleFallidos = fallidos.Count > 0
+                    ? "\nFallidos: " + string.Join(", ", fallidos)
+                    : string.Empty;
+
+                string detalleNoEncontrados = noEncontrados.Count > 0
+                    ? "\nNo encontrados localmente: " + string.Join(", ", noEncontrados)
+                    : string.Empty;
+
+                string detalleErrores = erroresDetalle.Count > 0
+                    ? "\nDetalles: " + string.Join(" | ", erroresDetalle)
+                    : string.Empty;
+
+                MessageBox.Show(
+                    $"Proceso finalizado con errores. Subidos correctamente: {correctos} de {archivosSeleccionadosParaSubir.Length}.{detalleFallidos}{detalleNoEncontrados}{detalleErrores}");
             }
         }
 
-        private void SubirArchivo(string rutaLocalCompleta, bool mostrarMsg = true)
+        private bool SubirArchivo(string rutaLocalCompleta, bool mostrarMsg, out string? error)
         {
+            error = null;
+
             string archivo = Path.GetFileName(rutaLocalCompleta);
             string extension = Path.GetExtension(archivo);
-            bool hubodirectorio = true;
 
-            if (DesaRadioButton.IsChecked == true)
+            string? directorioDestino = ResolveRemoteDirectory(rutaLocalCompleta, archivo, extension, DesaRadioButton.IsChecked == true);
+
+            if (string.IsNullOrWhiteSpace(directorioDestino))
             {
-                switch (extension)
+                error = $"{archivo}: no se determinó destino remoto";
+                if (mostrarMsg)
                 {
-                    case ".sh": directorio = "/sat/cdp/desa/cad"; break;
-                    case ".cbl":
-                    case ".pco": directorio = "/sat/cdp/desa/src"; break;
-                    case ".scl": directorio = "/sat/cdp/desa/cad/scl"; break;
-                    case ".fact": directorio = "/sat/cdp/desa/adm/fact"; break;
-                    case ".sql": directorio = "/sat/cdp/desa/adm/sql"; break;
-                    case "": directorio = "/sat/cdp/desa/cpy"; break;
-                    default: hubodirectorio = false; break;
+                    MessageBox.Show("No se pudo determinar el destino remoto para: " + archivo);
                 }
-            }
-            else
-            {
-                switch (extension)
-                {
-                    case ".sh": directorio = "/sat/cdp/test/cad"; break;
-                    case ".cbl":
-                    case ".pco": directorio = "/sat/cdp/test/src"; break;
-                    case ".scl": directorio = "/sat/cdp/test/cad/scl"; break;
-                    case ".fact": directorio = "/sat/cdp/test/adm/fact"; break;
-                    case ".sql": directorio = "/sat/cdp/test/adm/sql"; break;
-                    case "": directorio = "/sat/cdp/test/cpy"; break;
-                    default: hubodirectorio = false; break;
-                }
+
+                return false;
             }
 
-            if (!hubodirectorio)
-            {
-                MessageBox.Show("Error - No se encontró directorio válido para el archivo: " + archivo);
-                return;
-            }
+            directorio = directorioDestino;
 
             try
             {
@@ -220,8 +245,8 @@ namespace File_Wizard.UI.Wpf
                     if (MessageBox.Show("¿Estás seguro de sobreescribir este archivo?", "CONFIRMACION", MessageBoxButton.YesNo) == MessageBoxResult.No)
                     {
                         MessageBox.Show("SUBIDA CANCELADA POR EL USUARIO");
-                        subidaCorrecta = false;
-                        return;
+                        error = $"{archivo}: subida cancelada por el usuario";
+                        return false;
                     }
 
                     CrearRespaldoRemoto(rutaCompletaRemota);
@@ -241,14 +266,225 @@ namespace File_Wizard.UI.Wpf
                     if (mostrarMsg) MessageBox.Show("El archivo se subió, pero hubo un problema otorgando todos los permisos (chmod 777):\n" + chmodEx.Message);
                 }
 
-                subidaCorrecta = true;
+                error = null;
                 if (mostrarMsg) MessageBox.Show("El archivo se subió correctamente y se han dado todos los permisos (Chmod 777) :)");
+                return true;
             }
-            catch
+            catch (Exception ex)
             {
-                subidaCorrecta = false;
+                error = $"{archivo}: {ex.Message}";
                 if (mostrarMsg) MessageBox.Show("ERROR AL SUBIR EL ARCHIVO: " + archivo);
+                return false;
             }
+        }
+
+        private string? ResolveRemoteDirectory(string localPath, string archivo, string extension, bool isDesaEnvironment)
+        {
+            string environmentRoot = isDesaEnvironment ? "/sat/cdp/desa" : "/sat/cdp/test";
+            bool useDatSecRouting = DatSecRoutingCheckBox.IsChecked == true;
+
+            switch (extension.ToLowerInvariant())
+            {
+                case ".sh":
+                    return environmentRoot + "/cad";
+                case ".cbl":
+                case ".pco":
+                    return environmentRoot + "/src";
+                case ".scl":
+                    return environmentRoot + "/cad/scl";
+                case ".fact":
+                    return environmentRoot + "/adm/fact";
+                case ".sql":
+                    return environmentRoot + "/adm/sql";
+                case "":
+                    return ResolveCandidateDirectory(localPath, archivo, environmentRoot, useDatSecRouting);
+                default:
+                    return IsDatOrCpyCandidate(archivo)
+                        ? ResolveCandidateDirectory(localPath, archivo, environmentRoot, useDatSecRouting)
+                        : null;
+            }
+        }
+
+        private static bool IsDatOrCpyCandidate(string archivo)
+        {
+            // Components such as NG..., MP..., GO... can exist in either /dat or /cpy,
+            // even when they have a non-standard suffix after a dot.
+            return Regex.IsMatch(archivo, @"^(NG|MP|GO)", RegexOptions.IgnoreCase);
+        }
+
+        private string? ResolveCandidateDirectory(string localPath, string archivo, string environmentRoot, bool useDatSecRouting)
+        {
+            List<string> targets = GetAllowedTargets(useDatSecRouting);
+
+            UploadDestinationDecision? decision = destinationDecisions
+                .FirstOrDefault(item => string.Equals(item.LocalPath, localPath, StringComparison.OrdinalIgnoreCase));
+
+            if (decision == null || string.IsNullOrWhiteSpace(decision.SelectedTarget))
+            {
+                return null;
+            }
+
+            string normalized = decision.SelectedTarget.ToLowerInvariant();
+            return targets.Contains(normalized)
+                ? environmentRoot + "/" + normalized
+                : null;
+        }
+
+        private static List<string> GetAllowedTargets(bool useDatSecRouting)
+        {
+            // Default mode: DAT/CPY.
+            // DAT/SEC mode enabled: add SEC without removing CPY, so mixed batches are possible.
+            return useDatSecRouting
+                ? new List<string> { "dat", "cpy", "sec" }
+                : new List<string> { "dat", "cpy" };
+        }
+
+        private void RefreshDestinationDecisions()
+        {
+            SaveCurrentDecisionsToCache();
+            destinationDecisions.Clear();
+
+            if (archivosSeleccionadosParaSubir == null || archivosSeleccionadosParaSubir.Length == 0)
+            {
+                return;
+            }
+
+            bool isDesaEnvironment = DesaRadioButton.IsChecked == true;
+            string environmentRoot = isDesaEnvironment ? "/sat/cdp/desa" : "/sat/cdp/test";
+            bool useDatSecRouting = DatSecRoutingCheckBox.IsChecked == true;
+            List<string> allowedTargets = GetAllowedTargets(useDatSecRouting);
+
+            foreach (string localPath in archivosSeleccionadosParaSubir)
+            {
+                string fileName = Path.GetFileName(localPath);
+                string extension = Path.GetExtension(fileName);
+                bool isCandidate = extension.Length == 0 || IsDatOrCpyCandidate(fileName);
+
+                if (!isCandidate)
+                {
+                    continue;
+                }
+
+                string suggestedTarget = ResolveSuggestedTarget(localPath, fileName, environmentRoot, allowedTargets);
+
+                destinationDecisions.Add(new UploadDestinationDecision
+                {
+                    LocalPath = localPath,
+                    FileName = fileName,
+                    AvailableTargets = new List<string>(allowedTargets),
+                    SelectedTarget = suggestedTarget,
+                    DetectionStatus = BuildDetectionStatus(fileName, environmentRoot, allowedTargets)
+                });
+            }
+        }
+
+        private void SaveCurrentDecisionsToCache()
+        {
+            foreach (UploadDestinationDecision decision in destinationDecisions)
+            {
+                if (!string.IsNullOrWhiteSpace(decision.SelectedTarget))
+                {
+                    destinationChoiceCache[decision.LocalPath] = decision.SelectedTarget.ToLowerInvariant();
+                }
+            }
+        }
+
+        private string ResolveSuggestedTarget(string localPath, string fileName, string environmentRoot, List<string> allowedTargets)
+        {
+            if (destinationChoiceCache.TryGetValue(localPath, out string? cachedValue) &&
+                allowedTargets.Contains(cachedValue, StringComparer.OrdinalIgnoreCase))
+            {
+                return cachedValue;
+            }
+
+            if (client == null || !client.IsConnected)
+            {
+                return GetDefaultTargetWhenAmbiguous(fileName, allowedTargets);
+            }
+
+            var existingTargets = new List<string>();
+            foreach (string target in allowedTargets)
+            {
+                if (client.Exists(environmentRoot + "/" + target + "/" + fileName))
+                {
+                    existingTargets.Add(target);
+                }
+            }
+
+            if (existingTargets.Count == 1)
+            {
+                return existingTargets[0];
+            }
+
+            if (existingTargets.Count > 1)
+            {
+                return GetDefaultTargetWhenAmbiguous(fileName, allowedTargets);
+            }
+
+            return GetDefaultTargetWhenAmbiguous(fileName, allowedTargets);
+        }
+
+        private static string GetDefaultTargetWhenAmbiguous(string fileName, List<string> allowedTargets)
+        {
+            bool hasDat = allowedTargets.Contains("dat", StringComparer.OrdinalIgnoreCase);
+            bool hasCpy = allowedTargets.Contains("cpy", StringComparer.OrdinalIgnoreCase);
+
+            // If CPY is available and file does not look like a DAT payload, prefer CPY.
+            if (hasCpy)
+            {
+                return LooksLikeDatFile(fileName) && hasDat ? "dat" : "cpy";
+            }
+
+            if (hasDat)
+            {
+                return "dat";
+            }
+
+            return allowedTargets.First();
+        }
+
+        private static bool LooksLikeDatFile(string fileName)
+        {
+            // Typical DAT patterns observed in the downloader logic.
+            return Regex.IsMatch(fileName, @"^(NG|MP|GO)\d+\.F[A-Z0-9]+$", RegexOptions.IgnoreCase);
+        }
+
+        private string BuildDetectionStatus(string fileName, string environmentRoot, List<string> allowedTargets)
+        {
+            if (client == null || !client.IsConnected)
+            {
+                return "Sin conexión";
+            }
+
+            var existingTargets = new List<string>();
+            foreach (string target in allowedTargets)
+            {
+                if (client.Exists(environmentRoot + "/" + target + "/" + fileName))
+                {
+                    existingTargets.Add(target);
+                }
+            }
+
+            if (existingTargets.Count == 0)
+            {
+                return "No existe en servidor";
+            }
+
+            if (existingTargets.Count == 1)
+            {
+                return $"Solo {existingTargets[0]}";
+            }
+
+            return "Existe en: " + string.Join(", ", existingTargets);
+        }
+
+        private sealed class UploadDestinationDecision
+        {
+            public string LocalPath { get; set; } = string.Empty;
+            public string FileName { get; set; } = string.Empty;
+            public List<string> AvailableTargets { get; set; } = new List<string>();
+            public string SelectedTarget { get; set; } = string.Empty;
+            public string DetectionStatus { get; set; } = string.Empty;
         }
 
         private void CrearRespaldoRemoto(string rutaCompletaRemota)
@@ -294,7 +530,7 @@ namespace File_Wizard.UI.Wpf
         private void SetConnectedState()
         {
             UploadFileButton.IsEnabled = true;
-            UploadButton.IsEnabled = true;
+            ClearCacheButton.IsEnabled = true;
             BrowseButton.IsEnabled = true;
         }
 
@@ -303,7 +539,7 @@ namespace File_Wizard.UI.Wpf
             ConnectionStatusText.Text = "DESCONECTADO";
             ConnectionStatusText.Background = System.Windows.Media.Brushes.Tomato;
             UploadFileButton.IsEnabled = false;
-            UploadButton.IsEnabled = false;
+            ClearCacheButton.IsEnabled = false;
             BrowseButton.IsEnabled = true;
         }
     }
