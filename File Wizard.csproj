@@ -38,8 +38,5 @@
 
   <ItemGroup>
     <None Include=".github\copilot-instructions.md" />
-    <None Include="Resources\fondo2.jpg" />
-    <None Include="Resources\pug-sad-ezgif.com-effects.gif" />
-    <None Include="Resources\ezgif-42b42916a370d953.gif" />
   </ItemGroup>
 </Project>

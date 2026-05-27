@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Login SFTP"
         Width="420"
-        Height="320"
+        Height="360"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="#FFF5F8FC"
@@ -39,6 +39,7 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="30" />
                 <RowDefinition Height="34" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <TextBlock Text="Host" VerticalAlignment="Center" />
@@ -71,6 +72,15 @@
                 <ComboBoxItem Content="TEST" />
                 <ComboBoxItem Content="QA" />
             </ComboBox>
+
+            <TextBlock x:Name="EnvironmentStatusTextBlock"
+                       Grid.Row="5"
+                       Grid.Column="1"
+                       Margin="0,6,0,0"
+                       TextWrapping="Wrap"
+                       FontSize="10.5"
+                       Foreground="#991B1B"
+                       Text="" />
         </Grid>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
