@@ -8,6 +8,96 @@
         ResizeMode="NoResize"
         Background="#FFF5F8FC"
         FontFamily="Segoe UI">
+    <Window.Resources>
+        <Style x:Key="DashboardButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              Margin="{TemplateBinding Padding}"
+                                              RecognizesAccessKey="True" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1" />
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="1.02" ScaleY="1.02" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="0.98" ScaleY="0.98" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DashboardBlueButtonStyle" TargetType="Button" BasedOn="{StaticResource DashboardButtonStyle}">
+            <Setter Property="Background" Value="#1F6FEB" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1558C0" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#0F469D" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DashboardGreenButtonStyle" TargetType="Button" BasedOn="{StaticResource DashboardButtonStyle}">
+            <Setter Property="Background" Value="#1CA389" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#16846F" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#116658" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DashboardNavyButtonStyle" TargetType="Button" BasedOn="{StaticResource DashboardButtonStyle}">
+            <Setter Property="Background" Value="#0F172A" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#0B1221" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#080D18" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DashboardOrangeButtonStyle" TargetType="Button" BasedOn="{StaticResource DashboardButtonStyle}">
+            <Setter Property="Background" Value="#F59E0B" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#D98906" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#B87104" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="110" />
@@ -41,10 +131,11 @@
 
             <Button Grid.Row="0"
                     Grid.Column="0"
+                    x:Name="DesaTestDownloadButton"
+                    Style="{StaticResource DashboardBlueButtonStyle}"
                     Height="108"
                     Margin="0,0,0,16"
                     Padding="18,14"
-                    Background="#1F6FEB"
                     Foreground="White"
                     BorderThickness="0"
                     FontSize="11"
@@ -56,10 +147,11 @@
 
             <Button Grid.Row="0"
                     Grid.Column="2"
+                    x:Name="DesaTestUploadButton"
+                    Style="{StaticResource DashboardGreenButtonStyle}"
                     Height="108"
                     Margin="0,0,0,16"
                     Padding="18,14"
-                    Background="#1CA389"
                     Foreground="White"
                     BorderThickness="0"
                     FontSize="11"
@@ -71,10 +163,11 @@
 
             <Button Grid.Row="1"
                     Grid.Column="0"
+                    x:Name="QaDownloadButton"
+                    Style="{StaticResource DashboardNavyButtonStyle}"
                     Height="108"
                     Margin="0,0,0,16"
                     Padding="18,14"
-                    Background="#0F172A"
                     Foreground="White"
                     BorderThickness="0"
                     FontSize="11"
@@ -86,10 +179,11 @@
 
             <Button Grid.Row="1"
                     Grid.Column="2"
+                    x:Name="QaUploadButton"
+                    Style="{StaticResource DashboardOrangeButtonStyle}"
                     Height="108"
                     Margin="0,0,0,16"
                     Padding="18,14"
-                    Background="#F59E0B"
                     Foreground="White"
                     BorderThickness="0"
                     FontSize="11"
@@ -101,6 +195,7 @@
 
             <TextBlock Grid.Row="2"
                        Grid.ColumnSpan="3"
+                       x:Name="DashboardHintTextBlock"
                        VerticalAlignment="Bottom"
                        Foreground="#606C81"
                        FontSize="9"
